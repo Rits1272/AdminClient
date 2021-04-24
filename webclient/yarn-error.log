@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/share/yarn/bin/yarn.js add @material-ui/icon
+  /usr/local/bin/node /usr/share/yarn/bin/yarn.js add generate-password
 
 PATH: 
   /home/ritik/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/ritik/Android/Sdk/emulator:/home/ritik/Android/Sdk/tools:/home/ritik/Android/Sdk/tools/bin:/home/ritik/Android/Sdk/platform-tools:/usr/local/go/bin:/home/ritik/Android/Sdk/emulator:/home/ritik/Android/Sdk/tools:/home/ritik/Android/Sdk/tools/bin:/home/ritik/Android/Sdk/platform-tools
@@ -14,17 +14,8 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@material-ui%2ficon: Not found
-      at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66988:18)
-      at Request.self.callback (/usr/share/yarn/lib/cli.js:140749:22)
-      at Request.emit (events.js:315:20)
-      at Request.<anonymous> (/usr/share/yarn/lib/cli.js:141721:10)
-      at Request.emit (events.js:315:20)
-      at IncomingMessage.<anonymous> (/usr/share/yarn/lib/cli.js:141643:12)
-      at Object.onceWrapper (events.js:421:28)
-      at IncomingMessage.emit (events.js:327:22)
-      at endReadableNT (_stream_readable.js:1327:12)
-      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+  Error: connect EHOSTUNREACH 104.16.27.35:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1146:16)
 
 npm manifest: 
   {
@@ -33,6 +24,7 @@ npm manifest:
     "private": true,
     "dependencies": {
       "@material-ui/core": "^4.11.3",
+      "@material-ui/icons": "^4.11.2",
       "@testing-library/jest-dom": "^5.11.4",
       "@testing-library/react": "^11.1.0",
       "@testing-library/user-event": "^12.1.10",
@@ -1735,6 +1727,13 @@ Lockfile:
       prop-types "^15.7.2"
       react-is "^16.8.0 || ^17.0.0"
       react-transition-group "^4.4.0"
+  
+  "@material-ui/icons@^4.11.2":
+    version "4.11.2"
+    resolved "https://registry.yarnpkg.com/@material-ui/icons/-/icons-4.11.2.tgz#b3a7353266519cd743b6461ae9fdfcb1b25eb4c5"
+    integrity sha512-fQNsKX2TxBmqIGJCSi3tGTO/gZ+eJgWmMJkgDiOfyNaunNaxcklJQFaFogYcFl0qFuaEz1qaXYXboa/bUXVSOQ==
+    dependencies:
+      "@babel/runtime" "^7.4.4"
   
   "@material-ui/styles@^4.11.3":
     version "4.11.3"

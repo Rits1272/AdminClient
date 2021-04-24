@@ -109,7 +109,7 @@ export default function Login() {
         <Typography component="h1" variant="h6" className={classes.errorMsg}>
             {error}
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -149,11 +149,6 @@ export default function Login() {
             Sign In
           </Button>
           <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
             <Grid item>
               <Link href="/reset" variant="body2" onClick={e => navigateToReset(e)}>
                 {"Reset Password?"}
