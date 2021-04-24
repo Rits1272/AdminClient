@@ -118,7 +118,7 @@ export default function AddDrawing() {
             }, 5000);
 
             setDrawing("");
-            setDescription("");
+            setContact("");
             setQuantity("");
             setDescription("");
             setInspector("");

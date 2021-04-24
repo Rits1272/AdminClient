@@ -100,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NavBar() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const history = useHistory();
 
   const handleDrawerOpen = () => {
@@ -154,11 +154,13 @@ export default function NavBar() {
           </IconButton>
         </div>
         <Divider />
+        <List className={classes.listItem} onClick={() => navigate('home')}>Monitor</List>
+        <Divider />
         <List className={classes.listItem} onClick={() => navigate('register')}>Add New Role</List>
         <Divider />
         <List className={classes.listItem} onClick={() => navigate('AddDrawing')}>Add Drawings</List>
         <Divider />
-        <List className={classes.listItem}>Monthly Report</List>
+        <List className={classes.listItem} onClick={() => navigate('report')}>Monthly Report</List>
         <Divider />
         <List className={classes.listItem}>Employees</List>
         <Divider />

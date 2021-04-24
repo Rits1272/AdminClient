@@ -6,6 +6,7 @@ import Reset from '../src/components/Reset';
 import Home from '../src/components/Home';
 import Register from '../src/components/Register';
 import AddDrawing from '../src/components/AddDrawing';
+import Report from '../src/components/Report';
 
 import {Switch, BrowserRouter as Router, Route} from 'react-router-dom';
 
@@ -16,6 +17,7 @@ ReactDOM.render(
         <Route path='/login' component={Login}/>
         <Route path='/register' component={Register}/>
         <Route path='/AddDrawing' component={AddDrawing}/>
+        <Route path='/Report' component={Report}/> 
         <Route path='/' component={Home}/>
       </Switch>
   </Router>, document.getElementById('root')
