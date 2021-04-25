@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,82 +10,106 @@ import Paper from '@material-ui/core/Paper';
 import NavBar from '../utils/NavBar';
 import firebase from '../Firebase';
 import "firebase/database";
+import Chip from '@material-ui/core/Chip';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
+import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
+import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import AssesmentIcon from '@material-ui/icons/Assessment';
+import BarChartRoundedIcon from '@material-ui/icons/BarChartRounded';
+import FitnessCenterRoundedIcon from '@material-ui/icons/FitnessCenterRounded';
 
 const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
+    table: {
+        minWidth: 650,
+    },
+    data: {
+        fontSize: 17,
+    },
+    heading: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#ffffff'
+    },
+    iconStyle: {
+        verticalAlign: 'middle',
+        display: 'inline-flex',
+        marginRight: 8,
+    }
 });
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-
 export default function Home() {
-  const classes = useStyles();
+    const classes = useStyles();
 
-  const [rows, setRows] = useState([]);
+    const [rows, setRows] = useState([]);
 
-  const createData = (date, inspector, drawing, quantity, status) => {
-      return {date, inspector, quantity, drawing, status};
-  }
+    const fetchDetails = () => {
+        const ref = firebase.database().ref();
+        const itemref = ref.child('item');
 
-  const fetchDetails = () => {
-      const ref = firebase.database().ref();
-      const itemref = ref.child('item');
+        let tmp = [];
 
-      let tmp = [];
-
-      itemref.on("value", snap => {
-        let Data = snap.val();
-        Object.keys(Data).map(key => {
-            let res = Data[key];
-            let obj = {'date': res['date'], 'inspector': res['inspector_name'], 'drawing': res['drawing_no'], quantity: res['quantity'], status: res['status']};
-            tmp.push(obj);
+        itemref.on("value", snap => {
+            let Data = snap.val();
+            Object.keys(Data).map(key => {
+                let res = Data[key];
+                let obj = { 'date': res['date'], 'inspector': res['inspector_name'], 'drawing': res['drawing_no'], quantity: res['quantity'], status: res['status'] };
+                tmp.push(obj);
+            })
+            setRows(tmp)
         })
-        setRows(tmp)
-      })
-  }
+    }
 
-  useEffect(() => {
-    // fetch firebase date from here
-    fetchDetails();
-  }, [])
+    useEffect(() => {
+        // fetch firebase date from here
+        fetchDetails();
+    }, [])
 
-  console.log(rows)
-  return (
-      <div style={{display: 'flex'}}>
-          <NavBar/>
-    <TableContainer component={Paper} style={{margin: 10, marginTop: 80}} maxWidth="xl">
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell align="right" style={{fontSize: 18}}>Date</TableCell>
-            <TableCell align="right" style={{fontSize: 18}}>Drawing Number</TableCell>
-            <TableCell align="right" style={{fontSize: 18}}>Inspector&nbsp;</TableCell>
-            <TableCell align="right" style={{fontSize: 18}}>Quantity&nbsp;</TableCell>
-            <TableCell align="right" style={{fontSize: 18}}>Status&nbsp;</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.drawing}>
-              <TableCell align="right">{row.date}</TableCell>
-              <TableCell align="right">{row.drawing}</TableCell>
-              <TableCell align="right">{row.inspector}</TableCell>
-              <TableCell align="right">{row.quantity}</TableCell>
-  
-              {row.status === "ACCEPTED" &&  <TableCell align="right" style={{color: 'green', fontWeight: 'bold', fontSize: 16}}>{row.status}</TableCell>}
-              {row.status === "pending" &&  <TableCell align="right" style={{color: 'grey', fontWeight: 'bold', fontSize: 16}}>{row.status}</TableCell>}
-              {row.status === "Rejected" &&  <TableCell align="right" style={{color: 'red', fontWeight: 'bold', fontSize: 16}}>{row.status}</TableCell>}
+    return (
+        <div style={{ display: 'flex' }}>
+            <NavBar />
 
-            
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    </div>
-  );
+            <TableContainer component={Paper} style={{ margin: 10, marginTop: 80, elevation: 3 }} maxWidth="xl">
+                <Table className={classes.table} aria-label="simple table">
+                    <TableHead>
+                        <TableRow style={{backgroundColor: '#FE6B8B'}}>
+                            <TableCell align="right" className={classes.heading}><DateRangeIcon className={classes.iconStyle}/>Date</TableCell>
+                            <TableCell align="right" className={classes.heading}><AssesmentIcon className={classes.iconStyle}/>Drawing Number</TableCell>
+                            <TableCell align="right" className={classes.heading}><AccountCircleRoundedIcon className={classes.iconStyle}/>Inspector</TableCell>
+                            <TableCell align="right" className={classes.heading}><FitnessCenterRoundedIcon className={classes.iconStyle}/>Quantity</TableCell>
+                            <TableCell align="right" className={classes.heading}><BarChartRoundedIcon className={classes.iconStyle}/>Status</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rows.map((row) => (
+                            <TableRow key={row.drawing}>
+                                <TableCell className={classes.data} align="right">{row.date}</TableCell>
+                                <TableCell className={classes.data} align="right">{row.drawing}</TableCell>
+                                <TableCell className={classes.data} align="right">{row.inspector}</TableCell>
+                                <TableCell className={classes.data} align="right">{row.quantity}</TableCell>
+
+                                {row.status === "ACCEPTED" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                                    icon={<CheckCircleOutlineIcon style={{color: 'white'}} />}
+                                    label="ACCEPTED"
+                                    style={{backgroundColor: '#32CD32', color: 'white'}}
+                                /></TableCell>}
+                                {row.status === "Rejected" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                                    icon={<CancelOutlinedIcon style={{color: 'white'}} />}
+                                    label="REJECTED"
+                                    color="secondary"
+                                    style={{backgroundColor: '#DC143C', color: 'white', minWidth: 120}}
+                                /></TableCell>}          {row.status === "pending" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                                    icon={<HourglassEmptyOutlinedIcon style={{color: 'white'}} />}
+                                    label="PENDING"
+                                    color="grey"
+                                    style={{backgroundColor: '#a9a9a9', color: 'white', minWidth: 120}}
+                                /></TableCell>}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
+    );
 }

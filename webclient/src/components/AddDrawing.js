@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import NavBar from '../utils/NavBar';
 import { format } from 'date-fns';
 import Alert from '@material-ui/lab/Alert';
+import characterThree from '../utils/Images/characterThree.png';
 
 // Firebase imports
 import firebase from '../Firebase';
@@ -47,13 +46,14 @@ const useStyles = makeStyles((theme) => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
-        padding: 10,
+        padding: 7,
+        fontSize: 17, 
     },
     errorMsg: {
         color: 'red',
         fontSize: '14px',
         marginTop: '20px',
-    }
+    },
 }));
 
 
@@ -137,9 +137,8 @@ export default function AddDrawing() {
             <NavBar />
             <Container component="main" maxWidth="xs">
                 <div className={classes.paper}>
-                    <Avatar className={classes.avatar}>
-                        <LockOutlinedIcon />
-                    </Avatar>
+            <img src = {characterThree} class={classes.imgStyle}/>
+
                     <Typography component="h1" variant="h5" style={{ marginTop: 10 }}>
                         Add Drawing
                     </Typography>
@@ -162,6 +161,7 @@ export default function AddDrawing() {
                             margin="normal"
                             required
                             fullWidth
+                            secondary
                             value={inspector}
                             label="Inspector Name"
                             onChange={(e) => setValue(e, "inspector")}
@@ -201,14 +201,14 @@ export default function AddDrawing() {
                         <Button
                             type="submit"
                             fullWidth
+                            color="secondary"
                             variant="contained"
-                            color="primary"
                             className={classes.submit}
                             onClick={e => saveDetails(e)}
                         >Save</Button>
                     </form>
                 </div>
-                <Box mt={8}>
+                <Box mt={6}>
                     <Copyright />
                 </Box>
             </Container>
