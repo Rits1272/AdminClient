@@ -62,6 +62,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
+    height: '100%'
   },
   drawerPaperClose: {
     overflowX: 'hidden',
@@ -76,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    height: '100vh',
+    height: '100%',
     overflow: 'auto',
   },
   container: {
@@ -163,7 +164,7 @@ export default function NavBar() {
         <Divider />
         <List className={classes.listItem} onClick={() => navigate('report')}>Monthly Report</List>
         <Divider />
-        <List className={classes.listItem}>Employees</List>
+        <List className={classes.listItem} onClick={() => navigate('employees')}>Employees</List>
         <Divider />
       </Drawer>
     </div>
