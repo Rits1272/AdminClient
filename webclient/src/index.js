@@ -34,6 +34,12 @@ firebase.auth().onAuthStateChanged(function(user){
           <Switch>
             <Route path='/login' component={Login}/>
             <Route path='/reset' component={Reset}/>
+            <Route path='/login' component={Login}/>
+            <Route path='/register' component={Login}/>
+            <Route path='/AddDrawing' component={Login}/>
+            <Route path='/Report' component={Login}/> 
+            <Route path='/Employees' component={Login}/>
+            <Route path='/' component={Login}/>
           </Switch>
       </Router>, document.getElementById('root')
     );   

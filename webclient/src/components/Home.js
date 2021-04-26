@@ -19,6 +19,9 @@ import DateRangeIcon from '@material-ui/icons/DateRange';
 import AssesmentIcon from '@material-ui/icons/Assessment';
 import BarChartRoundedIcon from '@material-ui/icons/BarChartRounded';
 import FitnessCenterRoundedIcon from '@material-ui/icons/FitnessCenterRounded';
+import landscape from '../utils/Images/landscape.png';
+import Typography from '@material-ui/core/Typography';
+
 
 const useStyles = makeStyles({
     table: {
@@ -48,14 +51,25 @@ export default function Home() {
         const ref = firebase.database().ref();
         const itemref = ref.child('item');
 
+        const today = new Date();
+        const day = today.getDate();
+        const month = today.toLocaleString('default', {month: 'short'});
+        const year = today.getFullYear();
+
+        const queryDate = `${day}-${month}-${year}`;
+       
+        console.log(queryDate);
+
         let tmp = [];
 
         itemref.on("value", snap => {
             let Data = snap.val();
             Object.keys(Data).map(key => {
                 let res = Data[key];
-                let obj = { 'date': res['date'], 'inspector': res['inspector_name'], 'drawing': res['drawing_no'], quantity: res['quantity'], status: res['status'] };
-                tmp.push(obj);
+                if(res['date'] === queryDate){
+                    let obj = { 'date': res['date'], 'inspector': res['inspector_name'], 'drawing': res['drawing_no'], quantity: res['quantity'], status: res['status'] };
+                    tmp.push(obj);
+                }
             })
             setRows(tmp)
         })
@@ -69,7 +83,11 @@ export default function Home() {
     return (
         <div style={{ display: 'flex' }}>
             <NavBar />
-
+            {rows.length === 0 ? <div style={{width: '100%', textAlign: 'center', marginTop: 100}}>
+                <img src={landscape}/>
+                <Typography color="secondary" >Oopsie! No record found</Typography>
+            </div> 
+            : 
             <TableContainer component={Paper} style={{ margin: 10, marginTop: 80, elevation: 3 }} maxWidth="xl">
                 <Table className={classes.table} aria-label="simple table">
                     <TableHead>
@@ -107,9 +125,10 @@ export default function Home() {
                                 /></TableCell>}
                             </TableRow>
                         ))}
-                    </TableBody>
+                    </TableBody>    
                 </Table>
             </TableContainer>
+            }
         </div>
     );
 }

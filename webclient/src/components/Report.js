@@ -23,6 +23,9 @@ import Button from '@material-ui/core/Button';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import citylandscape from '../utils/Images/citylandscape.png';
+import Typography from '@material-ui/core/Typography';
+
 
 const useStyles = makeStyles({
   table: {
@@ -177,6 +180,12 @@ export default function Report() {
             >Search</Button>
           </FormControl>
         </div>
+        {rows.length === 0 ? <div style={{width: '100%', textAlign: 'center', marginTop: 100}}>
+                <img src={citylandscape}/>
+                <Typography color="secondary">No report found!</Typography>
+            </div> 
+            : 
+          <div>
         <div style={{textAlign: 'center'}}>
         <Button
               type="submit"
@@ -216,6 +225,8 @@ export default function Report() {
         </Table>
       </TableContainer>
       </div>
+    </div>
+}
     </div>
     </div>
   );
