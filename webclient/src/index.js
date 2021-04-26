@@ -10,17 +10,33 @@ import Report from '../src/components/Report';
 import Employees from '../src/components/Employees';
 
 import {Switch, BrowserRouter as Router, Route} from 'react-router-dom';
+import firebase from './Firebase';
 
-ReactDOM.render(
-  <Router>
-      <Switch>
-        <Route path='/reset' component={Reset}/>
-        <Route path='/login' component={Login}/>
-        <Route path='/register' component={Register}/>
-        <Route path='/AddDrawing' component={AddDrawing}/>
-        <Route path='/Report' component={Report}/> 
-        <Route path='/Employees' component={Employees}/>
-        <Route path='/' component={Home}/>
-      </Switch>
-  </Router>, document.getElementById('root')
-);
+firebase.auth().onAuthStateChanged(function(user){
+  if(user){
+    ReactDOM.render(
+      <Router>
+          <Switch>
+            <Route path='/reset' component={Reset}/>
+            <Route path='/login' component={Login}/>
+            <Route path='/register' component={Register}/>
+            <Route path='/AddDrawing' component={AddDrawing}/>
+            <Route path='/Report' component={Report}/> 
+            <Route path='/Employees' component={Employees}/>
+            <Route path='/' component={Home}/>
+          </Switch>
+      </Router>, document.getElementById('root')
+    );    
+  }
+  else{
+    ReactDOM.render(
+      <Router>
+          <Switch>
+            <Route path='/login' component={Login}/>
+            <Route path='/reset' component={Reset}/>
+          </Switch>
+      </Router>, document.getElementById('root')
+    );   
+  }
+})
+

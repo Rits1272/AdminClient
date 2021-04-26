@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { useHistory } from 'react-router-dom';
+
+import firebase from '../Firebase';
 
 const drawerWidth = 240;
 
@@ -35,7 +37,8 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    width: '100%',
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -46,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   menuButton: {
-    marginRight: 36,
+    marginRight: 10,
   },
   menuButtonHidden: {
     display: 'none',
@@ -103,6 +106,7 @@ const useStyles = makeStyles((theme) => ({
 export default function NavBar() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const [user, setUser] = React.useState();
   const history = useHistory();
 
   const handleDrawerOpen = () => {
@@ -119,11 +123,24 @@ export default function NavBar() {
     return;
   }
 
+  const logoutUser = (e) => {
+    e.preventDefault();
+    firebase.auth().signOut();
+    history.push("/login");
+  }
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(function(user) {
+      setUser(user);
+    })
+  }, []);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
         <Toolbar className={classes.toolbar}>
+          {user && 
           <IconButton
             edge="start"
             color="inherit"
@@ -133,13 +150,17 @@ export default function NavBar() {
           >
             <MenuIcon />
           </IconButton>
+          }
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             Documentive
           </Typography>
           <IconButton color="inherit">
-          <Typography component="h1" variant="h6" color="inherit">
-            Logout
-          </Typography>
+            {user ? <Typography component="h1" variant="h6" color="inherit" onClick = {(e) => logoutUser(e)}>
+              Logout
+          </Typography> :
+              <Typography component="h1" variant="h6" color="inherit">
+                Login
+          </Typography>}
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -156,7 +177,7 @@ export default function NavBar() {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.listItem} onClick={() => navigate('home')}>Monitor</List>
+        <List className={classes.listItem} onClick={() => navigate('home')}>Today</List>
         <Divider />
         <List className={classes.listItem} onClick={() => navigate('register')}>Add New Role</List>
         <Divider />

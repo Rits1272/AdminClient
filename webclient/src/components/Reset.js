@@ -11,6 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router-dom';
+import characterFive from '../utils/Images/characterFive.png';
+import NavBar2 from '../utils/NavBar2';
 
 // Firebase imports
 import firebase from '../Firebase';
@@ -35,16 +37,14 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(1)
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+    padding: 7,
+    fontSize: 17,
   },
   Msg: {
       color: '#ff0000',
@@ -95,12 +95,12 @@ export default function Reset() {
   }
 
   return (
+    <div style={{display: 'flex'}}>
+      <NavBar2/>
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
+        <img src={characterFive}/>
         <Typography component="h1" variant="h5">
           Reset Password
         </Typography>
@@ -121,24 +121,19 @@ export default function Reset() {
             onChange = {(e) => setValue(e, "email")}
           />
           <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-            onClick={e => resetUser(e)}
-          >
-            Reset
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="secondary"
+              className={classes.submit}
+              onClick={e => resetUser(e)}
+            >
+             Reset
           </Button>
           <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
             <Grid item>
-              <Link href="#" variant="body2" onClick={(e) => navigate(e, "login")}>
-                {"Login"}
+              <Link href="#" variant="body2" onClick={(e) => navigate(e, "login")} color="secondary">
+                {"Login?"}
               </Link>
             </Grid>
           </Grid>
@@ -148,5 +143,6 @@ export default function Reset() {
         <Copyright />
       </Box>
     </Container>
+    </div>
   );
 }

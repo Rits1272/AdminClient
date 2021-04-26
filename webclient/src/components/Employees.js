@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: red[500],
     },
     root: {
-        minWidth: 150,
+        minWidth: 250,
         marginTop: 80,
         maxWidth: 475,
         marginRight: 50,

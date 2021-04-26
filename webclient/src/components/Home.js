@@ -94,12 +94,12 @@ export default function Home() {
                                     label="ACCEPTED"
                                     style={{backgroundColor: '#32CD32', color: 'white'}}
                                 /></TableCell>}
-                                {row.status === "Rejected" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                                {row.status === "REJECTED" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
                                     icon={<CancelOutlinedIcon style={{color: 'white'}} />}
                                     label="REJECTED"
                                     color="secondary"
                                     style={{backgroundColor: '#DC143C', color: 'white', minWidth: 120}}
-                                /></TableCell>}          {row.status === "pending" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                                /></TableCell>}          {row.status === "PENDING" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
                                     icon={<HourglassEmptyOutlinedIcon style={{color: 'white'}} />}
                                     label="PENDING"
                                     color="grey"

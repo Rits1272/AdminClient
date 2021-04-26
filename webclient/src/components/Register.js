@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Login() {
+export default function Register() {
     const classes = useStyles();
 
     const [name, setName] = useState("");
@@ -141,6 +141,11 @@ export default function Login() {
 
             setMsg("Employee registered successfully!")
             setType("success")
+
+            setName("");
+            setContact("");
+            setRole("");
+            setEmail("");
         }
         catch (err) {
             setMsg("Something went wrong. Please make sure that fields are valid and email is unique")
