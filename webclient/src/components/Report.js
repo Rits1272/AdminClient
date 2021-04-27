@@ -25,7 +25,12 @@ import 'jspdf-autotable'
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import citylandscape from '../utils/Images/citylandscape.png';
 import Typography from '@material-ui/core/Typography';
-
+import Chart from "react-apexcharts";
+import Grid from '@material-ui/core/Grid';
+import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
+import Chip from '@material-ui/core/Chip';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 
 const useStyles = makeStyles({
   table: {
@@ -61,27 +66,85 @@ export default function Report() {
   const classes = useStyles();
 
   const [rows, setRows] = useState([]);
-  const [year, setYear] = useState("2021");
+  const [year, setYear] = useState(2021);
   const [month, setMonth] = useState(1);
+  const [barDate, setBarDate] = useState([]);
+  const [categories, setCategories] = useState();
+
+  var barSeries = [{
+    name: "Quantity",
+    data: barDate,
+  }]
+
+  var barOptions = {
+    chart: {
+      type: 'area',
+      height: 350,
+      width: '100%',
+      minWidth: 200,
+      zoom: {
+        enabled: false
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'smooth'
+    },
+    title: {
+      text: 'Quantity incoming',
+      align: 'center'
+    },
+    subtitle: {
+      text: 'Quantity Movements',
+      align: 'left'
+    },
+    labels: categories,
+    yaxis: {
+      opposite: false
+    },
+    legend: {
+      horizontalAlign: 'left'
+    },
+    colors : ['#ff0000']
+  }
 
   const fetchDetails = () => {
     const ref = firebase.database().ref();
 
     const itemref = ref.child(`report/${year}/${month}`);
 
-    let tmp = [];
+    let accepted = 0, rejected = 0, pending = 0;
 
     itemref.on("value", snap => {
       let Data = snap.val();
-      if(Data !== null){
+      let tmp = [];
+      if (Data !== null) {
         Object.keys(Data).map(key => {
           let res = Data[key];
-          let obj = { 'date': res['date'], 'inspector': res['inspector'], 'drawing': res['drawing'], quantity: res['quantity'], accepted: res['accepted'], rejected: res['rejected'] };
+          let obj = { 'date': res['date'], 'inspector': res['inspector'], 'drawing': res['drawing'], 'quantity': res['quantity'], 'status': res['status'] };
+
           tmp.push(obj);
+
+          if (obj['status'] === "ACCEPTED") {
+            accepted = accepted + 1;
+          }
+          else if (obj['status'] === 'REJECTED') {
+            rejected = rejected + 1;
+          }
+          else {
+            pending = pending + 1;
+          }
         })
-        setRows(tmp)
+
+        setRows(tmp);
+        let Dates = tmp.map(val => val['date']);
+        let OptionData = tmp.map(val => val['quantity']);
+        setBarDate(OptionData);
+        setCategories(Dates);
       }
-      else{
+      else {
         setRows([])
       }
     })
@@ -97,7 +160,7 @@ export default function Report() {
     }
   }
 
-  const exportPDF = () => { 
+  const exportPDF = () => {
     const unit = "pt";
     const size = "A4";
     const orientation = "portrait";
@@ -107,31 +170,32 @@ export default function Report() {
 
     doc.setFontSize(15);
     const title = `${month}-${year} report`;
-    const headers = [["Date", "Drawing Number", "Inspector", "Quantity", "Accepted", "Rejected"]];
+    const headers = [["Date", "Drawing Number", "Inspector", "Quantity", "Status"]];
 
-    const data = rows.map(res => [res.date, res.drawing, res.inspector, res.quantity, res.accepted, res.rejected]);
+    const data = rows.map(res => [res.date, res.drawing, res.inspector, res.quantity, res.status]);
 
     let content = {
-    startY: 50,
-    head: headers,
-    body: data
+      startY: 50,
+      head: headers,
+      body: data
     };
 
     doc.text(title, marginLeft, 40);
     doc.autoTable(content);
     doc.save(`${month}_${year}_report.pdf`)
-}
+  }
 
   useEffect(() => {
     // fetch firebase date from here
     fetchDetails();
-  }, [])
+  }, []);
+
 
   return (
-    <div style={{ display: 'flex'}}>
+    <div style={{ display: 'flex' }}>
       <NavBar />
-      <div style={{width: "100%", marginRight: 20}}>
-        <div class={classes.inputDiv}>
+      <div style={{ width: "100%", marginRight: 20 }}>
+        <div className={classes.inputDiv}>
           <FormControl className={classes.formControl}>
             <InputLabel id="demo-simple-select-label">Year</InputLabel>
             <Select
@@ -176,58 +240,87 @@ export default function Report() {
               color="secondary"
               variant="outlined"
               className={classes.submit}
-              onClick = {(e) => fetchDetails(e)}
+              onClick={(e) => fetchDetails(e)}
             >Search</Button>
           </FormControl>
         </div>
-        {rows.length === 0 ? <div style={{width: '100%', textAlign: 'center', marginTop: 100}}>
-                <img src={citylandscape}/>
-                <Typography color="secondary">No report found!</Typography>
-            </div> 
-            : 
-          <div>
-        <div style={{textAlign: 'center'}}>
-        <Button
-              type="submit"
-              color="secondary"
-              variant="outlined"
-              onClick={() => exportPDF()}
-              className={classes.submit}
-              style={{minWidth: 200}}
-              startIcon={<SaveAltIcon/>}
-            >Export PDF</Button>
+        {(rows.length === 0)? <div style={{ width: '100%', textAlign: 'center', marginTop: 100 }}>
+          <img src={citylandscape} />
+          <Typography color="secondary">No report found!</Typography>
         </div>
-      <div>
-      <TableContainer component={Paper} style={{ margin: 10, marginTop: 20, elevation: 3, marginTop: 30 }} maxWidth="xl">
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow style={{ backgroundColor: '#FE6B8B' }}>
-              <TableCell align="right" className={classes.heading}><DateRangeIcon className={classes.iconStyle} />Date</TableCell>
-              <TableCell align="right" className={classes.heading}><AssesmentIcon className={classes.iconStyle} />Drawing Number</TableCell>
-              <TableCell align="right" className={classes.heading}><AccountCircleRoundedIcon className={classes.iconStyle} />Inspector</TableCell>
-              <TableCell align="right" className={classes.heading}><FitnessCenterRoundedIcon className={classes.iconStyle} />Quantity</TableCell>
-              <TableCell align="right" className={classes.heading}><BarChartRoundedIcon className={classes.iconStyle} />Accepted</TableCell>
-              <TableCell align="right" className={classes.heading}><BarChartRoundedIcon className={classes.iconStyle} />Rejected</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.drawing}>
-                <TableCell className={classes.data} align="right">{row.date}</TableCell>
-                <TableCell className={classes.data} align="right">{row.drawing}</TableCell>
-                <TableCell className={classes.data} align="right">{row.inspector}</TableCell>
-                <TableCell className={classes.data} align="right">{row.quantity}</TableCell>
-                <TableCell className={classes.data} align="right">{row.accepted}</TableCell>
-                <TableCell className={classes.data} align="right">{row.rejected}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          :
+          <div>
+            <div style={{ width: '100%', marginTop: 20 }}>
+              <Grid container spacing={2} justify="center">
+                  <Paper>
+
+                <Grid item xs={12}>
+                    <Chart
+                      options={barOptions}
+                      series={barSeries}
+                      type="area"
+                      width={500}
+                    />
+                </Grid>
+                </Paper>
+
+              </Grid>
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 50 }}>
+              <Button
+                type="submit"
+                color="secondary"
+                variant="outlined"
+                onClick={() => exportPDF()}
+                className={classes.submit}
+                style={{ minWidth: 200 }}
+                startIcon={<SaveAltIcon />}
+              >Export PDF</Button>
+            </div>
+            <div>
+              <TableContainer component={Paper} style={{ margin: 10, marginTop: 20, elevation: 3, marginTop: 30 }} maxWidth="xl">
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow style={{ backgroundColor: '#FE6B8B' }}>
+                      <TableCell align="right" className={classes.heading}><DateRangeIcon className={classes.iconStyle} />Date</TableCell>
+                      <TableCell align="right" className={classes.heading}><AssesmentIcon className={classes.iconStyle} />Drawing Number</TableCell>
+                      <TableCell align="right" className={classes.heading}><AccountCircleRoundedIcon className={classes.iconStyle} />Inspector</TableCell>
+                      <TableCell align="right" className={classes.heading}><FitnessCenterRoundedIcon className={classes.iconStyle} />Quantity</TableCell>
+                      <TableCell align="right" className={classes.heading}><BarChartRoundedIcon className={classes.iconStyle} />Status</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows && rows.map((row) => (
+                      <TableRow key={row.drawing}>
+                        <TableCell className={classes.data} align="right">{row.date}</TableCell>
+                        <TableCell className={classes.data} align="right">{row.drawing}</TableCell>
+                        <TableCell className={classes.data} align="right">{row.inspector}</TableCell>
+                        <TableCell className={classes.data} align="right">{row.quantity}</TableCell>
+                        {row.status === "ACCEPTED" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                          icon={<CheckCircleOutlineIcon style={{ color: 'white' }} />}
+                          label="ACCEPTED"
+                          style={{ backgroundColor: '#32CD32', color: 'white' }}
+                        /></TableCell>}
+                        {row.status === "REJECTED" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                          icon={<CancelOutlinedIcon style={{ color: 'white' }} />}
+                          label="REJECTED"
+                          color="secondary"
+                          style={{ backgroundColor: '#DC143C', color: 'white', minWidth: 120 }}
+                        /></TableCell>}          {row.status === "PENDING" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
+                          icon={<HourglassEmptyOutlinedIcon style={{ color: 'white' }} />}
+                          label="PENDING"
+                          color="grey"
+                          style={{ backgroundColor: '#a9a9a9', color: 'white', minWidth: 120 }}
+                        /></TableCell>}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
+          </div>
+        }
       </div>
-    </div>
-}
-    </div>
-    </div>
+    </div >
   );
 }

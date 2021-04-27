@@ -12,6 +12,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { useHistory } from 'react-router-dom';
+import Chip from '@material-ui/core/Chip';
+
 
 import firebase from '../Firebase';
 
@@ -98,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
   },
   listItem: {
     padding: 20,
-    fontSize: 15,
+    fontSize: 16,
     cursor: 'pointer'
   }
 }));
