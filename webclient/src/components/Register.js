@@ -120,6 +120,11 @@ export default function Register() {
             // Register the user
             firebase.auth().createUserWithEmailAndPassword(email, pass);
 
+            setTimeout(() => {
+                firebase.auth().sendPasswordResetEmail(email);
+                console.log("Reset Mail send successfully!")
+            }, 2000);
+
             // send the mail to the user to reset the password
             firebase.auth().sendPasswordResetEmail(email);
             console.log("Reset mail sent!")
@@ -138,14 +143,13 @@ export default function Register() {
                 name: name,
             });
             console.log("Meta data added successfully!")
-
-            setMsg("Employee registered successfully!")
-            setType("success")
-
             setName("");
             setContact("");
             setRole("");
             setEmail("");
+
+            setMsg("Employee registered successfully!")
+            setType("success")
         }
         catch (err) {
             setMsg("Something went wrong. Please make sure that fields are valid and email is unique")
@@ -178,6 +182,7 @@ export default function Register() {
                             fullWidth
                             label="Name"
                             autoFocus
+                            value = {name}
                             onChange={(e) => setValue(e, "name")}
                         />
                         <TextField
@@ -185,6 +190,7 @@ export default function Register() {
                             margin="normal"
                             required
                             fullWidth
+                            value = {email}
                             label="Email Address"
                             onChange={(e) => setValue(e, "email")}
                         />
@@ -195,6 +201,7 @@ export default function Register() {
                             fullWidth
                             label="Contact"
                             type="number"
+                            value = {contact}
                             onChange={(e) => setValue(e, "contact")}
                         />
                         <FormControl variant="outlined" fullWidth margin="normal">

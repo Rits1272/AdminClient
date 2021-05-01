@@ -133,6 +133,7 @@ export default function NavBar() {
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(function(user) {
+      console.log(user)
       setUser(user);
     })
   }, []);
@@ -157,7 +158,7 @@ export default function NavBar() {
             Documentive
           </Typography>
           <IconButton color="inherit">
-            {user ? <Typography component="h1" variant="h6" color="inherit" onClick = {(e) => logoutUser(e)}>
+            {user !== null ? <Typography component="h1" variant="h6" color="inherit" onClick = {(e) => logoutUser(e)}>
               Logout
           </Typography> :
               <Typography component="h1" variant="h6" color="inherit">

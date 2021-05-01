@@ -57,13 +57,10 @@ export default function Home() {
         const year = today.getFullYear();
 
         const queryDate = `${day}-${month}-${year}`;
-       
-        console.log(queryDate);
-
-        let tmp = [];
-
+        
         itemref.on("value", snap => {
             let Data = snap.val();
+            let tmp = [];
             Object.keys(Data).map(key => {
                 let res = Data[key];
                 if(res['date'] === queryDate){

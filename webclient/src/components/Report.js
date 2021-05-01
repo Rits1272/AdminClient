@@ -31,6 +31,7 @@ import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutline
 import Chip from '@material-ui/core/Chip';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
+import { DataUsageTwoTone, SentimentDissatisfiedSharp } from '@material-ui/icons';
 
 const useStyles = makeStyles({
   table: {
@@ -70,18 +71,21 @@ export default function Report() {
   const [month, setMonth] = useState(1);
   const [barDate, setBarDate] = useState([]);
   const [categories, setCategories] = useState();
+  const [areacategories, setAreaCategories] = useState();
+  const [acceptedDate, setAcceptedDate] = useState([]);
+  const [rejectetDate, setrejectetDate] = useState([]);
+  const [pendingDate, setpendingDate] = useState([]);
+  const [quantityDate, setQuantityDate] = useState([]);
 
   var barSeries = [{
     name: "Quantity",
-    data: barDate,
+    data: quantityDate,
   }]
 
   var barOptions = {
     chart: {
       type: 'area',
-      height: 350,
-      width: '100%',
-      minWidth: 200,
+      height:'auto',
       zoom: {
         enabled: false
       }
@@ -100,49 +104,147 @@ export default function Report() {
       text: 'Quantity Movements',
       align: 'left'
     },
-    labels: categories,
+    labels: areacategories,
     yaxis: {
       opposite: false
     },
     legend: {
       horizontalAlign: 'left'
     },
-    colors : ['#ff0000']
+    title: {
+      text: 'Quantity incoming',
+      align: 'center'
+    },
+    subtitle: {
+      text: 'Quantity Movements',
+      align: 'left'
+    },
+    colors: ['#ff0000']
   }
+
+  var Areaseries = [{
+    name: 'Accepted',
+    data: acceptedDate,
+  }, {
+    name: 'Rejected',
+    data: rejectetDate,
+  }, {
+    name: 'Pending',
+    data: pendingDate,
+  }];
+
+  var Areaoptions = {
+    chart: {
+      height: 'auto',
+      type: 'area',
+      zoom: {
+        enabled: false
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'smooth'
+    },
+    xaxis: {
+      type: 'date',
+      categories: areacategories,
+    },
+    title: {
+      text: 'Status',
+      align: 'center'
+    },
+    legend: {
+      horizontalAlign: 'center'
+    },
+    colors: ['#00ff00', '#ff0000', '#a3a3a3']
+  };
 
   const fetchDetails = () => {
     const ref = firebase.database().ref();
 
     const itemref = ref.child(`report/${year}/${month}`);
 
-    let accepted = 0, rejected = 0, pending = 0;
-
     itemref.on("value", snap => {
       let Data = snap.val();
       let tmp = [];
+      let acceptedData = {};
+      let rejectedData = {};
+      let pendingData = {};
+      let quantityData = {};
+      var dateSet = new Set();
+
       if (Data !== null) {
         Object.keys(Data).map(key => {
           let res = Data[key];
           let obj = { 'date': res['date'], 'inspector': res['inspector'], 'drawing': res['drawing'], 'quantity': res['quantity'], 'status': res['status'] };
 
+          let q = res['quantity'];
+          q = q.slice(0, q.length-2);
+          q = parseInt(q);
+
           tmp.push(obj);
+          dateSet.add(res['date']);
+          
+          if(quantityData[res['date']]){
+            quantityData[res['date']] = quantityData[res['date']] + q;
+          }
+          else{
+            quantityData[res['date']] = q;
+          }
 
           if (obj['status'] === "ACCEPTED") {
-            accepted = accepted + 1;
+            if(acceptedData[res['date']]){
+              acceptedData[res['date']] = acceptedData[res['date']] + 1;
+            }
+            else{
+              acceptedData[res['date']] = 1;
+            }
           }
           else if (obj['status'] === 'REJECTED') {
-            rejected = rejected + 1;
+            if(rejectedData[res['date']]){
+              rejectedData[res['date']] = rejectedData[res['date']] + 1;
+            }
+            else{
+              rejectedData[res['date']] = 1;
+            }
           }
           else {
-            pending = pending + 1;
+            if(pendingData[res['date']]){
+              pendingData[res['date']] = pendingData[res['date']] + 1;
+            }
+            else{
+              pendingData[res['date']] = 1;
+            }
           }
         })
-
+        setRows([]);
         setRows(tmp);
         let Dates = tmp.map(val => val['date']);
         let OptionData = tmp.map(val => val['quantity']);
         setBarDate(OptionData);
         setCategories(Dates);
+        tmp = [];
+        let accepted = [], rejected = [], pending = [], tmpDates = [], quantity = [];
+        dateSet.forEach((value) => {
+          accepted.push(acceptedData[value] || 0);
+          rejected.push(rejectedData[value] || 0);
+          pending.push(pendingData[value] || 0);
+          quantity.push(quantityData[value]);
+          tmpDates.push(value);
+        });
+        setAcceptedDate(accepted);
+        setrejectetDate(rejected);
+        setpendingDate(pending);
+        setAreaCategories(tmpDates);
+        setQuantityDate(quantity);
+        accepted = [];
+        rejected = [];
+        pending = [];
+        tmpDates = [];
+        quantity = [];
+
       }
       else {
         setRows([])
@@ -244,29 +346,33 @@ export default function Report() {
             >Search</Button>
           </FormControl>
         </div>
-        {(rows.length === 0)? <div style={{ width: '100%', textAlign: 'center', marginTop: 100 }}>
+        {(rows.length === 0) ? <div style={{ width: '100%', textAlign: 'center', marginTop: 100 }}>
           <img src={citylandscape} />
           <Typography color="secondary">No report found!</Typography>
         </div>
           :
           <div>
-            <div style={{ width: '100%', marginTop: 20 }}>
-              <Grid container spacing={2} justify="center">
-                  <Paper>
-
-                <Grid item xs={12}>
+            <div style={{ width: '100%', marginTop: 30 }}>
+              <Grid container spacing={5} justify="center">
+                <Paper elevation={4} style={{marginRight: 20, marginBottom: 30}}>
+                  <Grid item xs={12}>
                     <Chart
                       options={barOptions}
                       series={barSeries}
                       type="area"
-                      width={500}
+                      width={450}
+                      height={300}
                     />
-                </Grid>
+                  </Grid>
                 </Paper>
-
+                <Paper elevation={4} style={{marginBottom: 30}}>
+                  <Grid item xs={12}>
+                    <Chart options={Areaoptions} series={Areaseries} type="area" width={450} height={300}/>
+                  </Grid>
+                </Paper>
               </Grid>
             </div>
-            <div style={{ textAlign: 'center', marginTop: 50 }}>
+            <div style={{ textAlign: 'center', marginTop: 20 }}>
               <Button
                 type="submit"
                 color="secondary"
