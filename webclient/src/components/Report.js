@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import NavBar from '../utils/NavBar';
 import firebase from '../Firebase';
-import "firebase/database";
 import AccountCircleRoundedIcon from '@material-ui/icons/AccountCircleRounded';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import AssesmentIcon from '@material-ui/icons/Assessment';
@@ -31,7 +30,7 @@ import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutline
 import Chip from '@material-ui/core/Chip';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
-import { DataUsageTwoTone, SentimentDissatisfiedSharp } from '@material-ui/icons';
+import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles({
   table: {
@@ -342,6 +341,7 @@ export default function Report() {
               color="secondary"
               variant="outlined"
               className={classes.submit}
+              startIcon={<SearchIcon/>}
               onClick={(e) => fetchDetails(e)}
             >Search</Button>
           </FormControl>

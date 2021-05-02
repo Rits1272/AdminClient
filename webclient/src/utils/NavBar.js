@@ -12,8 +12,6 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { useHistory } from 'react-router-dom';
-import Chip from '@material-ui/core/Chip';
-
 
 import firebase from '../Firebase';
 
@@ -189,6 +187,8 @@ export default function NavBar() {
         <List className={classes.listItem} onClick={() => navigate('report')}>Monthly Report</List>
         <Divider />
         <List className={classes.listItem} onClick={() => navigate('employees')}>Employees</List>
+        <Divider />
+        <List className={classes.listItem} onClick={() => navigate('inventory')}>Inventory</List>
         <Divider />
       </Drawer>
     </div>
