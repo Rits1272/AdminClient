@@ -26,7 +26,6 @@ import citylandscape from '../utils/Images/citylandscape.png';
 import Typography from '@material-ui/core/Typography';
 import Chart from "react-apexcharts";
 import Grid from '@material-ui/core/Grid';
-import HourglassEmptyOutlinedIcon from '@material-ui/icons/HourglassEmptyOutlined';
 import Chip from '@material-ui/core/Chip';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
@@ -69,11 +68,9 @@ export default function Report() {
   const [year, setYear] = useState(2021);
   const [month, setMonth] = useState(1);
   const [barDate, setBarDate] = useState([]);
-  const [categories, setCategories] = useState();
   const [areacategories, setAreaCategories] = useState();
   const [acceptedDate, setAcceptedDate] = useState([]);
   const [rejectetDate, setrejectetDate] = useState([]);
-  const [pendingDate, setpendingDate] = useState([]);
   const [quantityDate, setQuantityDate] = useState([]);
 
   var barSeries = [{
@@ -127,10 +124,8 @@ export default function Report() {
   }, {
     name: 'Rejected',
     data: rejectetDate,
-  }, {
-    name: 'Pending',
-    data: pendingDate,
-  }];
+  }
+];
 
   var Areaoptions = {
     chart: {
@@ -157,7 +152,7 @@ export default function Report() {
     legend: {
       horizontalAlign: 'center'
     },
-    colors: ['#00ff00', '#ff0000', '#a3a3a3']
+    colors: ['#00ff00', '#ff0000']
   };
 
   const fetchDetails = () => {
@@ -165,12 +160,11 @@ export default function Report() {
 
     const itemref = ref.child(`report/${year}/${month}`);
 
-    itemref.on("value", snap => {
+    itemref.once("value", snap => {
       let Data = snap.val();
       let tmp = [];
       let acceptedData = {};
       let rejectedData = {};
-      let pendingData = {};
       let quantityData = {};
       var dateSet = new Set();
 
@@ -209,41 +203,34 @@ export default function Report() {
               rejectedData[res['date']] = 1;
             }
           }
-          else {
-            if(pendingData[res['date']]){
-              pendingData[res['date']] = pendingData[res['date']] + 1;
-            }
-            else{
-              pendingData[res['date']] = 1;
-            }
-          }
         })
         setRows([]);
         setRows(tmp);
-        let Dates = tmp.map(val => val['date']);
+        let Dates = tmp.map(val => {
+          let x = val['date'];
+          x = x.split('-')[0];
+          return x;
+        });
         let OptionData = tmp.map(val => val['quantity']);
         setBarDate(OptionData);
-        setCategories(Dates);
         tmp = [];
-        let accepted = [], rejected = [], pending = [], tmpDates = [], quantity = [];
+        let accepted = [], rejected = [], tmpDates = [], quantity = [];
         dateSet.forEach((value) => {
           accepted.push(acceptedData[value] || 0);
           rejected.push(rejectedData[value] || 0);
-          pending.push(pendingData[value] || 0);
           quantity.push(quantityData[value]);
-          tmpDates.push(value);
+          let x = value.split('-')[0];
+          if(x[0] === '0') x = x[1];
+          tmpDates.push(x);
         });
         setAcceptedDate(accepted);
         setrejectetDate(rejected);
-        setpendingDate(pending);
         setAreaCategories(tmpDates);
         setQuantityDate(quantity);
         accepted = [];
         rejected = [];
-        pending = [];
         tmpDates = [];
         quantity = [];
-
       }
       else {
         setRows([])
@@ -412,11 +399,6 @@ export default function Report() {
                           label="REJECTED"
                           color="secondary"
                           style={{ backgroundColor: '#DC143C', color: 'white', minWidth: 120 }}
-                        /></TableCell>}          {row.status === "PENDING" && <TableCell align="right" style={{ color: 'green', fontWeight: 'bold', fontSize: 16 }}>   <Chip
-                          icon={<HourglassEmptyOutlinedIcon style={{ color: 'white' }} />}
-                          label="PENDING"
-                          color="grey"
-                          style={{ backgroundColor: '#a9a9a9', color: 'white', minWidth: 120 }}
                         /></TableCell>}
                       </TableRow>
                     ))}

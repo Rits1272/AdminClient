@@ -70,11 +70,11 @@ const useStyles = makeStyles({
 
 export default function Inventory() {
     const classes = useStyles();
-    const [data, setData] = useState({});
+    const [data, setData] = useState();
     const [parameters, setParameters] = useState({});
     const [material, setMaterial] = useState([]);
     const [activeMaterial, setActiveMaterial] = useState("");
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const [newMaterial, setNewMaterial] = useState([{ parameter: '', value: 'null' }]);
     const [name, setName] = useState("");
     const [msg, setMsg] = useState("");
@@ -121,7 +121,7 @@ export default function Inventory() {
         });
         try{
             const ref = firebase.database().ref();
-            // ref.child(`inventory/${name}`).set(obj);
+            ref.child(`inventory/${name}`).set(obj);
             setMsg("Material added to inventory successfully!")
             setType("success");
         }
@@ -134,6 +134,26 @@ export default function Inventory() {
         }
     }
 
+    const saveDetails = (e) => {
+        e.preventDefault();
+        const ref = firebase.database().ref();
+        const obj = data[activeMaterial];
+        try{
+            ref.child(`inventory/${activeMaterial}`).set(obj);
+            setMsg("Data values updated sucessfully!")
+        }
+        catch(err){
+            setMsg("Unable to update data values!")
+        }
+        return;
+    }
+
+    const updateParameter = (e, param) => {
+        const tmp = data;
+        tmp[activeMaterial][param] = e.target.value;
+        setData(tmp);
+    }
+
     const disappear = () => {
         if(msg !== ""){
             setTimeout(() => setMsg(""), 5000);
@@ -144,8 +164,9 @@ export default function Inventory() {
         const ref = firebase.database().ref();
         const inventoryRef = ref.child('inventory');
 
-        inventoryRef.once("value", snap => {
+        inventoryRef.on("value", snap => {
             let Data = snap.val();
+            setData(Data);
             let params = {};
             let tmp = {};
             let tmpMaterial = [];
@@ -158,14 +179,12 @@ export default function Inventory() {
                 tmpMaterial.push(key);
                 tmp[key] = params;
             })
-            setData(tmp);
             setMaterial(tmpMaterial);
             setParameters(params);
         })
     }, []);
 
     disappear();
-
     return (
         <div style={{ display: 'flex' }}>
             <CssBaseline />
@@ -250,17 +269,16 @@ export default function Inventory() {
                                 </Select>
                             </FormControl>
                             {activeMaterial !== "" &&
-                                parameters[activeMaterial].map((item, index) => {
+                                parameters[activeMaterial].map(item => {
                                     return (
                                         <TextField
                                             variant="outlined"
                                             margin="normal"
                                             required
-                                            // value={drawing}
                                             fullWidth
                                             label={item}
                                             autoFocus
-                                        // onChange={(e) => setValue(e, "drawing")}
+                                            onChange = {(e) => updateParameter(e, item)}
                                         />
                                     )
                                 })
@@ -272,7 +290,7 @@ export default function Inventory() {
                                     color="secondary"
                                     variant="contained"
                                     className={classes.submit}
-                                //  onClick={(e) => fetchDetails(e)}
+                                    onClick = {e => saveDetails(e)}
                                 >Submit</Button>}
                         </form>
                     </div>
