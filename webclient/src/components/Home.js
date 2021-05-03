@@ -54,12 +54,20 @@ export default function Home() {
         const itemref = ref.child('item');
 
         const today = new Date();
-        const day = today.getDate();
-        const month = today.toLocaleString('default', {month: 'short'});
-        const year = today.getFullYear();
+        let day = today.getDate();
+        let month = today.getMonth() + 1;
+        let year = today.getFullYear();
+
+        if(month <= 9){
+            month = '0' + month;
+        }
+
+        if(day <= 9){
+            day = '0' + day;
+        }
 
         const queryDate = `${day}-${month}-${year}`;
-        
+        console.log(queryDate)
         itemref.on("value", snap => {
             let Data = snap.val();
             let tmp = [];

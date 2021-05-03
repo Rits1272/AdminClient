@@ -20,8 +20,8 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Documentive
+      <Link color="inherit">
+        Gatisheel
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -79,9 +79,8 @@ export default function Login() {
     try {
       firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
       // TODO : Get the role of the user from here using the mail if successfull log in
-
       history.push("/");
-      })
+      }).catch(err => setMsg("Invalid email or password!"))
     }
     catch (err) {
       setMsg("Either email or password is incorrect!")
@@ -100,7 +99,6 @@ export default function Login() {
   }
 
   const navigateToReset = (e) => {
-    console.log("PUSHED")
     e.preventDefault();
     history.push("/reset");
   }
@@ -124,7 +122,7 @@ export default function Login() {
             Sign in
         </Typography>
           {
-            msg !== "" && <Alert severity={"error"}>{msg}</Alert>
+            msg !== "" && <Alert style={{marginTop: 20}} severity={"error"}>{msg}</Alert>
           }
           <form className={classes.form}>
             <TextField

@@ -79,7 +79,7 @@ export default function NavBar2() {
       <AppBar position="absolute" className={clsx(classes.appBar)}>
         <Toolbar className={classes.toolbar}>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Documentive
+            Gatisheel
           </Typography>
         </Toolbar>
       </AppBar>
