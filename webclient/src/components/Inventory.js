@@ -19,6 +19,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Alert from '@material-ui/lab/Alert';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { useHistory } from 'react-router-dom';
 
 
 const useStyles = makeStyles({
@@ -79,6 +80,7 @@ export default function Inventory() {
     const [name, setName] = useState("");
     const [msg, setMsg] = useState("");
     const [type, setType] = useState();
+    const history = useHistory();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -161,6 +163,11 @@ export default function Inventory() {
     }
 
     useEffect(() => {
+        firebase.auth().onAuthStateChanged(function(user){
+            if(!user){
+                history.push('/login')
+            }
+        })
         const ref = firebase.database().ref();
         const inventoryRef = ref.child('inventory');
 

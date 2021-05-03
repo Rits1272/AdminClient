@@ -21,6 +21,7 @@ import BarChartRoundedIcon from '@material-ui/icons/BarChartRounded';
 import FitnessCenterRoundedIcon from '@material-ui/icons/FitnessCenterRounded';
 import landscape from '../utils/Images/landscape.png';
 import Typography from '@material-ui/core/Typography';
+import { useHistory } from 'react-router-dom';
 
 
 const useStyles = makeStyles({
@@ -44,6 +45,7 @@ const useStyles = makeStyles({
 
 export default function Home() {
     const classes = useStyles();
+    const history = useHistory();
 
     const [rows, setRows] = useState([]);
 
@@ -73,7 +75,11 @@ export default function Home() {
     }
 
     useEffect(() => {
-        // fetch firebase date from here
+        firebase.auth().onAuthStateChanged(function(user){
+            if(!user){
+                history.push('/login')
+            }
+        })
         fetchDetails();
     }, [])
 

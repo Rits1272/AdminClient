@@ -14,6 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import NavBar from '../utils/NavBar';
 import characterOne from '../utils/Images/characterOne.png';
 import Alert from '@material-ui/lab/Alert';
+import {useHistory} from 'react-router-dom';
 
 
 // Firebase imports
@@ -72,6 +73,15 @@ export default function Register() {
 
     const [msg, setMsg] = useState("");
     const [type, setType] = useState("success");
+    const history = useHistory();
+
+    React.useEffect(() => {
+        firebase.auth().onAuthStateChanged(function(user){
+            if(!user){
+                history.push('/login')
+            }
+        })
+    }, []);
 
     const validEmail = (email) => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

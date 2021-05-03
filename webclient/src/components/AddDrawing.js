@@ -11,6 +11,7 @@ import NavBar from '../utils/NavBar';
 import { format } from 'date-fns';
 import Alert from '@material-ui/lab/Alert';
 import characterThree from '../utils/Images/characterThree.png';
+import {useHistory} from 'react-router-dom';
 
 // Firebase imports
 import firebase from '../Firebase';
@@ -59,13 +60,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddDrawing() {
     const classes = useStyles();
-
     const [drawing, setDrawing] = useState("");
     const [inspector, setInspector] = useState("");
     const [quantity, setQuantity] = useState("");
     const [status, setStatus] = useState("Pending");
     const [contact, setContact] = useState("");
     const [description, setDescription] = useState("");
+
+    const history = useHistory();
+
 
     const [msg, setMsg] = useState("");
     const [type, setType] = useState("");
@@ -92,6 +95,14 @@ export default function AddDrawing() {
             setDescription(val);
         }
     }
+
+    React.useEffect(() => {
+        firebase.auth().onAuthStateChanged(function(user){
+            if(!user){
+                history.push('/login')
+            }
+        })   
+    }, []);
 
     const saveDetails = (e) => {
         e.preventDefault();

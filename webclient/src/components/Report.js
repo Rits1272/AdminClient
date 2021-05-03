@@ -30,6 +30,7 @@ import Chip from '@material-ui/core/Chip';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import SearchIcon from '@material-ui/icons/Search';
+import {useHistory} from 'react-router-dom';
 
 const useStyles = makeStyles({
   table: {
@@ -72,6 +73,8 @@ export default function Report() {
   const [acceptedDate, setAcceptedDate] = useState([]);
   const [rejectetDate, setrejectetDate] = useState([]);
   const [quantityDate, setQuantityDate] = useState([]);
+
+  const history = useHistory();
 
   var barSeries = [{
     name: "Quantity",
@@ -274,7 +277,11 @@ export default function Report() {
   }
 
   useEffect(() => {
-    // fetch firebase date from here
+    firebase.auth().onAuthStateChanged(function(user){
+      if(!user){
+          history.push('/login')
+      }
+  })
     fetchDetails();
   }, []);
 

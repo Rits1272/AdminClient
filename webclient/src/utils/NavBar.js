@@ -153,37 +153,37 @@ export default function PersistentDrawerLeft() {
         <Divider />
         <List>       
              <ListItem button key={"Daily Report"} >
-              <ListItemIcon><AssignmentIcon /></ListItemIcon>
+              <ListItemIcon><AssignmentIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={() => navigate('home')} primary={"Daily Report"} />
             </ListItem>
 
             <ListItem button key={"Add New Roles"} >
-              <ListItemIcon><PersonAddIcon /></ListItemIcon>
+              <ListItemIcon><PersonAddIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={() => navigate('register')} primary={"Add New Roles"} />
             </ListItem>
 
             <ListItem button key={"Add Drawings"} >
-              <ListItemIcon><InboxIcon /></ListItemIcon>
+              <ListItemIcon><InboxIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={() => navigate('AddDrawing')} primary={"Add Drawings"} />
             </ListItem>
 
             <ListItem button key={"Monthly Report"} >
-              <ListItemIcon><AssignmentTurnedInIcon /></ListItemIcon>
+              <ListItemIcon><AssignmentTurnedInIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={() => navigate('report')} primary={"Monthly Report"} />
             </ListItem>
 
             <ListItem button key={"Inventory"} >
-              <ListItemIcon><StoreMallDirectoryIcon /></ListItemIcon>
+              <ListItemIcon><StoreMallDirectoryIcon color="secondary"  /></ListItemIcon>
               <ListItemText onClick={() => navigate('inventory')} primary={"Inventory"} />
             </ListItem>
 
             <ListItem button key={"Employees"} >
-              <ListItemIcon><PeopleIcon /></ListItemIcon>
+              <ListItemIcon><PeopleIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={() => navigate('employees')} primary={"Employees"} />
             </ListItem>
 
             <ListItem button key={"Logout"} >
-              <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+              <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={logoutUser} primary={"Logout"} />
             </ListItem>
            
