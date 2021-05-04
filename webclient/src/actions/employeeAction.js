@@ -9,7 +9,7 @@ export const getEmployees = (employees) => ({
 /*
     Fetches all the users from firebase data
 */
-export function fetchEmployees(){
+export function fetchEmployees (){
     const ref = firebase.database().ref();
     return dispatch => {
         let employees = [];

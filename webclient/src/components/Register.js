@@ -171,7 +171,6 @@ function Register(props) {
                             required
                             fullWidth
                             label="Contact"
-                            type="number"
                             value = {contact}
                             onChange={(e) => setValue(e, "contact")}
                         />
@@ -183,6 +182,7 @@ function Register(props) {
                                 value={role}
                                 onChange={e => setValue(e, "role")}
                                 label="Role"
+                                required
                                 fullWidth
                             >
                                 <MenuItem value={"admin"}>Admin</MenuItem>

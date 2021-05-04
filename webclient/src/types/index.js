@@ -5,3 +5,8 @@ export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const RESET_PASSWORD = 'RESET_PASSWORD';
 
 export const ADD_ROLE = 'ADD_ROLE';
+
+export const ADD_DRAWING = 'ADD_DRAWING';
+
+export const DAILY_REPORT = 'DAILY_REPORT';
+export const MONTHLY_REPORT = 'MONTHLY_REPORT';

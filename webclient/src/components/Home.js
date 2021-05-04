@@ -23,6 +23,26 @@ import landscape from '../utils/Images/landscape.png';
 import Typography from '@material-ui/core/Typography';
 import { useHistory } from 'react-router-dom';
 
+import { connect } from 'react-redux';
+import { getDailyReport } from '../actions/reportAction';
+
+const queryDate = () => {
+    const today = new Date();
+    let day = today.getDate();
+    let month = today.getMonth() + 1;
+    let year = today.getFullYear();
+
+    if(month <= 9){
+        month = '0' + month;
+    }
+
+    if(day <= 9){
+        day = '0' + day;
+    }
+
+    return `${day}-${month}-${year}`;
+}
+
 
 const useStyles = makeStyles({
     table: {
@@ -43,48 +63,21 @@ const useStyles = makeStyles({
     }
 });
 
-export default function Home() {
+function Home(props) {
     const classes = useStyles();
-    const history = useHistory();
-
-    const [rows, setRows] = useState([]);
-
-    const fetchDetails = () => {
-        const ref = firebase.database().ref();
-        const itemref = ref.child('item');
-
-        const today = new Date();
-        let day = today.getDate();
-        let month = today.getMonth() + 1;
-        let year = today.getFullYear();
-
-        if(month <= 9){
-            month = '0' + month;
-        }
-
-        if(day <= 9){
-            day = '0' + day;
-        }
-
-        const queryDate = `${day}-${month}-${year}`;
-        itemref.on("value", snap => {
-            let Data = snap.val();
-            let tmp = [];
-            Object.keys(Data).map(key => {
-                let res = Data[key];
-                if(res['date'] === queryDate){
-                    let obj = { 'date': res['date'], 'inspector': res['inspector_name'], 'drawing': res['drawing_no'], quantity: res['quantity'], status: res['status'] };
-                    tmp.push(obj);
-                }
-            })
-            setRows(tmp)
-        })
-    }
+    const { data } = props;
+    const { mapDispatch, dispatch } = props;
+    
+    useEffect(() => {
+        dispatch(getDailyReport(queryDate()))
+        const time = 1000 * 60 * 5; // polls in every 5 minutes
+        setInterval(() => dispatch(getDailyReport(queryDate())), time);
+    }, []);
 
     return (
         <div style={{ display: 'flex' }}>
             <NavBar />
-            {rows.length === 0 ? <div style={{width: '100%', textAlign: 'center', marginTop: 100}}>
+            {data.length === 0 ? <div style={{width: '100%', textAlign: 'center', marginTop: 100}}>
                 <img src={landscape}/>
                 <Typography color="secondary" >Oopsie! No record found</Typography>
             </div> 
@@ -101,8 +94,8 @@ export default function Home() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => (
-                            <TableRow key={row.drawing}>
+                        {data.map((row, index) => (
+                            <TableRow key={index}>
                                 <TableCell className={classes.data} align="right">{row.date}</TableCell>
                                 <TableCell className={classes.data} align="right">{row.drawing}</TableCell>
                                 <TableCell className={classes.data} align="right">{row.inspector}</TableCell>
@@ -133,3 +126,10 @@ export default function Home() {
         </div>
     );
 }
+
+const mapState = state => ({
+    data : state.reportReducer.data,
+})
+
+
+export default connect(mapState)(Home);
