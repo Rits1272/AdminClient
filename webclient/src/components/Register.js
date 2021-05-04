@@ -14,11 +14,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import NavBar from '../utils/NavBar';
 import characterOne from '../utils/Images/characterOne.png';
 import Alert from '@material-ui/lab/Alert';
-import {useHistory} from 'react-router-dom';
 
-
-// Firebase imports
-import firebase from '../Firebase';
+import { connect } from 'react-redux';
+import { AddNewRole } from '../actions/addNewRoleAction';
 
 var generator = require('generate-password');
 
@@ -63,25 +61,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Register() {
+function Register(props) {
     const classes = useStyles();
-
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [contact, setContact] = useState("");
     const [role, setRole] = useState("");
-
     const [msg, setMsg] = useState("");
     const [type, setType] = useState("success");
-    const history = useHistory();
-
-    React.useEffect(() => {
-        firebase.auth().onAuthStateChanged(function(user){
-            if(!user){
-                history.push('/login')
-            }
-        })
-    }, []);
+    const { success, dispatch } = props;
 
     const validEmail = (email) => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -114,59 +102,32 @@ export default function Register() {
     const registerUser = (e) => {
         e.preventDefault();
 
-        // Generating a random password for the new user to be registered
-        var pass = generator.generate({
-            length: 8,
-            numbers: true,
-        })
-
-        // A quick validation for the inputs provided by the admin
-        if (name === "" || contact === "" || role === "" || !validEmail(email) || pass === "") {
-            setMsg("Please enter valid details!");
+        if(!validEmail(email)){
+            setMsg("Please enter a valid email address");
+            setType("error");
             return;
         }
 
-        try {
-            // Register the user
-            firebase.auth().createUserWithEmailAndPassword(email, pass);
+        // Generating a random temporary password for the new user
+        let password = generator.generate({
+            length: 8,
+            numbers: true,
+        });
 
-            setTimeout(() => {
-                firebase.auth().sendPasswordResetEmail(email);
-                console.log("Reset Mail send successfully!")
-            }, 2000);
+        dispatch(AddNewRole(name, email, password, contact, role));
 
-            // send the mail to the user to reset the password
-            firebase.auth().sendPasswordResetEmail(email);
-            console.log("Reset mail sent!")
-
-            // Add metadata of the user
-            const EMAIL = email.replace('.', ',');
-            const ROLE = role.toLowerCase();
-
-            const ref = firebase.database().ref();
-            const userRef = ref.child(`${ROLE}/${EMAIL}/`);
-
-            userRef.set({
-                email: email,
-                role: role,
-                contact: contact,
-                name: name,
-            });
-            console.log("Meta data added successfully!")
+        if(success){
             setName("");
             setContact("");
             setRole("");
             setEmail("");
-
             setMsg("Employee registered successfully!")
             setType("success")
         }
-        catch (err) {
-            setMsg("Something went wrong. Please make sure that fields are valid and email is unique")
-            setType("error")
-            console.log("Error registering the user", err);
-            return;
-        }
+        else{
+            setMsg("Some unknown error occurred");
+            setType("error");
+        }       
     }
 
     disappear();
@@ -224,10 +185,11 @@ export default function Register() {
                                 label="Role"
                                 fullWidth
                             >
-                                <MenuItem value={"Admin"}>Admin</MenuItem>
-                                <MenuItem value={"Inspector"}>Inspector</MenuItem>
-                                <MenuItem value={"Custodian"}>Custodian</MenuItem>
-                                <MenuItem value={"Viewer"}>Viewer</MenuItem>
+                                <MenuItem value={"admin"}>Admin</MenuItem>
+                                <MenuItem value={"inspector"}>Inspector</MenuItem>
+                                <MenuItem value={"custodian"}>Custodian</MenuItem>
+                                <MenuItem value={"monitor"}>Monitor</MenuItem>
+                                <MenuItem value={"Power user"}>Power User</MenuItem>
                             </Select>
                         </FormControl>
                         <Button
@@ -249,3 +211,11 @@ export default function Register() {
         </div>
     );
 }
+
+const mapState = state => {
+    return {
+        success: state.addNewRoleReducer.success,
+    }
+}
+
+export default connect(mapState)(Register);
