@@ -8,13 +8,13 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { useHistory } from 'react-router-dom';
 import NavBar2 from '../utils/NavBar2';
 import CharacterTwo from '../utils/Images/CharacterTwo.png';
 import Alert from '@material-ui/lab/Alert';
+import { Redirect } from "react-router-dom";
 
-// Firebase imports
-import firebase from '../Firebase';
+import { connect } from 'react-redux';
+import { loginUser } from '../actions/loginAction';
 
 function Copyright() {
   return (
@@ -57,36 +57,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Login() {
+function Login (props) {
   const classes = useStyles();
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [msg, setMsg] = useState("");
-  const history = useHistory();
-
-
-  useEffect(() => {
-    firebase.auth().onAuthStateChanged(function(user){
-      if(user){
-        history.push("/");
-      }
-    })
-  }, []);
-
-  const loginUser = (e) => {
-    e.preventDefault();
-    try {
-      firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
-      // TODO : Get the role of the user from here using the mail if successfull log in
-      history.push("/");
-      }).catch(err => setMsg("Invalid email or password!"))
-    }
-    catch (err) {
-      setMsg("Either email or password is incorrect!")
-      console.log("Error loggin in user", err);
-    }
-  }
+  const { loginError, isAuthenticated, dispatch } = props;
 
   const setValue = (e, type) => {
     e.preventDefault();
@@ -98,10 +75,13 @@ export default function Login() {
     }
   }
 
-  const navigateToReset = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    history.push("/reset");
-  }
+    dispatch(loginUser(email, password));
+    if(loginError){
+      setMsg("Incorrect email or password!")
+    }
+  } 
 
   const disappear = () => {
     if (msg !== "") {
@@ -110,6 +90,10 @@ export default function Login() {
   }
 
   disappear();
+
+  if(isAuthenticated){
+    return <Redirect to="/" />;
+  }
 
   return (
     <div style={{ display: 'flex' }}>
@@ -155,13 +139,13 @@ export default function Login() {
               variant="contained"
               color="secondary"
               className={classes.submit}
-              onClick={e => loginUser(e)}
+              onClick={e => handleSubmit(e)}
             >
               Sign In
           </Button>
             <Grid container>
               <Grid item>
-                <Link href="/reset" variant="body2" color="secondary" onClick={e => navigateToReset(e)}>
+                <Link href="/reset" variant="body2" color="secondary">
                   {"Reset Password?"}
                 </Link>
               </Grid>
@@ -175,3 +159,13 @@ export default function Login() {
     </div>
   );
 }
+
+const mapState = state => {
+  return {
+    isLogginIn: state.loginReducer.isLogginIn,
+    loginError: state.loginReducer.loginError,
+    isAuthenticated: state.loginReducer.isAuthenticated,
+  };
+}
+
+export default connect(mapState)(Login);

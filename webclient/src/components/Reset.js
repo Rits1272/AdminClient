@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import Avatar from '@material-ui/core/Avatar';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -9,12 +8,12 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { useHistory } from 'react-router-dom';
+import Alert from '@material-ui/lab/Alert';
 import characterFive from '../utils/Images/characterFive.png';
 import NavBar2 from '../utils/NavBar2';
 
-// Firebase imports
-import firebase from '../Firebase';
+import { connect } from 'react-redux';
+import { resetPassword } from '../actions/loginAction';
 
 function Copyright() {
   return (
@@ -46,18 +45,19 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 17,
   },
   Msg: {
-      color: '#ff0000',
-      fontSize: '14px',
-      marginTop: '20px',
+    color: '#ff0000',
+    fontSize: '14px',
+    marginTop: '20px',
   }
 }));
 
-export default function Reset() {
+function Reset(props) {
   const classes = useStyles();
 
   const [email, setEmail] = useState();
-  const [msg, setMsg] = useState();
-  const history = useHistory();
+  const [msg, setMsg] = useState("");
+  const [type, setType] = useState("");
+  const { linkSent, dispatch } = props;
 
   const validEmail = (email) => {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -65,61 +65,57 @@ export default function Reset() {
   }
 
   const resetUser = (e) => {
-      e.preventDefault();
-      if(!validEmail(email)){
+    e.preventDefault();
+    if (!validEmail(email)) {
         setMsg("Please enter valid email address!");
-        return;
-      }
-      try{
-        firebase.auth().sendPasswordResetEmail(email);
-        setMsg("Password link sent to email successfully!");
-        setEmail("");
-      }
-      catch(err){
-          setMsg("Please enter valid email address");
-      }
+        setType("error");
+      return;
+    }
+    dispatch(resetPassword(email));
+    if (linkSent) {
+      setMsg("Reset Password link sent to your email");
+      setType("success");
+    }
+    else {
+      setMsg("Please enter valid email address!");
+      setType("error");
+    }
   }
 
   const setValue = (e, type) => {
-      e.preventDefault();
-      if(type === "email"){
-         setEmail(e.target.value);
-      }
-  }
-
-  const navigate = (e, type) => {
-      e.preventDefault();
-      const path = "/" + type;
-      history.push(path);
+    e.preventDefault();
+    if (type === "email") {
+      setEmail(e.target.value);
+    }
   }
 
   return (
-    <div style={{display: 'flex'}}>
-      <NavBar2/>
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <img src={characterFive}/>
-        <Typography component="h1" variant="h5">
-          Reset Password
+    <div style={{ display: 'flex' }}>
+      <NavBar2 />
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <img src={characterFive} />
+          <Typography component="h1" variant="h5">
+            Reset Password
         </Typography>
-        <Typography component="h1" variant="h6" className={classes.Msg}>
-            {msg}
-        </Typography>
-        <form className={classes.form} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            onChange = {(e) => setValue(e, "email")}
-          />
-          <Button
+          {
+            msg !== "" && <Alert style={{ marginTop: 20 }} severity={type}>{msg}</Alert>
+          }
+          <form className={classes.form} noValidate>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              onChange={(e) => setValue(e, "email")}
+            />
+            <Button
               type="submit"
               fullWidth
               variant="contained"
@@ -127,21 +123,29 @@ export default function Reset() {
               className={classes.submit}
               onClick={e => resetUser(e)}
             >
-             Reset
+              Reset
           </Button>
-          <Grid container>
-            <Grid item>
-              <Link href="#" variant="body2" onClick={(e) => navigate(e, "login")} color="secondary">
-                {"Login?"}
-              </Link>
+            <Grid container>
+              <Grid item>
+                <Link href="/login" variant="body2" color="secondary">
+                  {"Login?"}
+                </Link>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
-    </Container>
+          </form>
+        </div>
+        <Box mt={8}>
+          <Copyright />
+        </Box>
+      </Container>
     </div>
   );
 }
+
+const mapState = state => {
+  return {
+    linkSent: state.loginReducer.linkSent,
+  }
+}
+
+export default connect(mapState)(Reset);

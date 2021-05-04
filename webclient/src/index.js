@@ -12,18 +12,23 @@ import Employees from '../src/components/Employees';
 
 import {Switch, BrowserRouter as Router, Route} from 'react-router-dom';
 
+import { Provider } from 'react-redux';
+import store from './store';
+
 ReactDOM.render(
-  <Router>
-    <Switch>
-      <Route path='/reset' component={Reset}/>
-      <Route path='/login' component={Login}/>
-      <Route path='/register' component={Register}/>
-      <Route path='/AddDrawing' component={AddDrawing}/>
-      <Route path='/report' component={Report}/> 
-      <Route path='/employees' component={Employees}/>
-      <Route path='/inventory' component={Inventory}/>
-      <Route path='/' component={Home}/>
-    </Switch>
-  </Router>, document.getElementById('root')
-)
+  <Provider store={store}>
+    <Router>
+      <Switch>
+        <Route path='/reset' component={Reset}/>
+        <Route path='/login' component={Login}/>
+        <Route path='/register' component={Register}/>
+        <Route path='/AddDrawing' component={AddDrawing}/>
+        <Route path='/report' component={Report}/> 
+        <Route path='/employees' component={Employees}/>
+        <Route path='/inventory' component={Inventory}/>
+        <Route path='/' component={Home}/>
+      </Switch>
+    </Router>
+    </Provider>, document.getElementById('root')
+);
 

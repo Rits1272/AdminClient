@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React  from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
 import Card from '@material-ui/core/Card';
@@ -7,14 +7,15 @@ import CardContent from '@material-ui/core/CardContent';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
-import firebase from '../Firebase';
 import NavBar from '../utils/NavBar';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import {useHistory} from 'react-router-dom';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
+
+import  { connect } from 'react-redux';
+import { fetchEmployees } from '../actions/employeeAction';
 
 const useStyles = makeStyles((theme) => ({
     gridList: {
@@ -45,18 +46,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Employees() {
+function Employees(props) {
     const classes = useStyles();
-
-    const [inspector, setInspector] = useState([]);
-    const [custodian, setCustodian] = useState([]);
-    const [admin, setAdmin] = useState([]);
-    const [users, setUsers] = useState([]);
-
-    const history = useHistory();
-
     const [open, setOpen] = React.useState(false);
-
+    
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -65,64 +58,12 @@ export default function Employees() {
         setOpen(false);
     };
 
-
-    const fetchUsers = () => {
-        const ref = firebase.database().ref();
-
-        let tmp = [];
-
-        // fetch inspectors
-        const inspectorRef = ref.child('inspector');
-        inspectorRef.once("value", snap => {
-            const data = snap.val();
-            Object.keys(data).map(key => {
-                let res = data[key];
-                tmp.push({ 'name': res['name'], 'email': res['reg_id'], 'contact': res['phn'], 'role': 'Inspector' });
-            });
-            setInspector(tmp);
-        })
-
-        // fetch custodians
-        const custodianRef = ref.child('custodian');
-        custodianRef.once("value", snap => {
-            const data = snap.val();
-            Object.keys(data).map(key => {
-                let res = data[key];
-                tmp.push({ 'name': res['name'], 'email': res['reg_id'], 'contact': res['phn'], 'role': 'Custodian' });
-            });
-            setCustodian(tmp);
-        })
-
-        // fetch admins
-        const adminRef = ref.child('admin');
-        adminRef.once("value", snap => {
-            const data = snap.val();
-            Object.keys(data).map(key => {
-                let res = data[key];
-                tmp.push({ 'name': res['name'], 'email': res['reg_id'], 'contact': res['phn'], 'role': 'Admin' });
-            });
-            setAdmin(tmp);
-        })
-
-        setUsers(tmp);
-    }
-
-    useEffect(() => {
-        firebase.auth().onAuthStateChanged(function(user){
-            if(!user){
-                history.push('/login')
-            }
-        })
-        fetchUsers();
-    }, [])
-
-    console.log(inspector)
     return (
         <div style={{ display: 'flex' }}>
             <NavBar />
             <div style={{ width: '100' }}>
                 <GridList cols={3}>
-                    {users.map((tile) => (
+                    {props.employees.employeeReducer.map((tile) => (
                         <Card className={classes.root}>
                             <CardHeader
                                 action={
@@ -169,3 +110,14 @@ export default function Employees() {
         </div>
     );
 }
+
+const mapState = state => ({
+    employees: state
+})
+
+const mapDispatch = dispatch => {
+    dispatch(fetchEmployees())
+    return {};
+}
+
+export default connect(mapState, mapDispatch)(Employees);

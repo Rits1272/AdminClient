@@ -67,7 +67,6 @@ export default function Home() {
         }
 
         const queryDate = `${day}-${month}-${year}`;
-        console.log(queryDate)
         itemref.on("value", snap => {
             let Data = snap.val();
             let tmp = [];
@@ -81,15 +80,6 @@ export default function Home() {
             setRows(tmp)
         })
     }
-
-    useEffect(() => {
-        firebase.auth().onAuthStateChanged(function(user){
-            if(!user){
-                history.push('/login')
-            }
-        })
-        fetchDetails();
-    }, [])
 
     return (
         <div style={{ display: 'flex' }}>

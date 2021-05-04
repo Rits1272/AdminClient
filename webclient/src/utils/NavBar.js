@@ -181,7 +181,7 @@ export default function PersistentDrawerLeft() {
               <ListItemIcon><PeopleIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={() => navigate('employees')} primary={"Employees"} />
             </ListItem>
-
+            <Divider/>
             <ListItem button key={"Logout"} >
               <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={logoutUser} primary={"Logout"} />
