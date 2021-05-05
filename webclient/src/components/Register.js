@@ -187,7 +187,7 @@ function Register(props) {
                             >
                                 <MenuItem value={"admin"}>Admin</MenuItem>
                                 <MenuItem value={"inspector"}>Inspector</MenuItem>
-                                <MenuItem value={"custodian"}>Custodian</MenuItem>
+                                <MenuItem value={"custodian"}>Initiator</MenuItem>
                                 <MenuItem value={"monitor"}>Monitor</MenuItem>
                                 <MenuItem value={"Power user"}>Power User</MenuItem>
                             </Select>

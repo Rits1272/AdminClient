@@ -8,8 +8,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import NavBar from '../utils/NavBar';
-import firebase from '../Firebase';
-import "firebase/database";
 import Chip from '@material-ui/core/Chip';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
@@ -21,7 +19,6 @@ import BarChartRoundedIcon from '@material-ui/icons/BarChartRounded';
 import FitnessCenterRoundedIcon from '@material-ui/icons/FitnessCenterRounded';
 import landscape from '../utils/Images/landscape.png';
 import Typography from '@material-ui/core/Typography';
-import { useHistory } from 'react-router-dom';
 
 import { connect } from 'react-redux';
 import { getDailyReport } from '../actions/reportAction';
@@ -130,6 +127,5 @@ function Home(props) {
 const mapState = state => ({
     data : state.reportReducer.data,
 })
-
 
 export default connect(mapState)(Home);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -25,6 +25,8 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useHistory } from 'react-router-dom';
 import firebase from '../Firebase';
 
+import { connect } from 'react-redux';
+import { loginAction, userRole } from '../actions/loginAction';
 
 const drawerWidth = 240;
 
@@ -86,11 +88,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PersistentDrawerLeft() {
+function NavBar(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); // siedbar open by default
   const history = useHistory();
+  let {  email, role, dispatch } = props;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -112,6 +115,10 @@ export default function PersistentDrawerLeft() {
     history.push("/login");
   }
 
+  useEffect(() => {
+    dispatch(userRole(email))
+  }, []);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -131,8 +138,11 @@ export default function PersistentDrawerLeft() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap>
+          <Typography component="h1" variant="h6" color="inherit" noWrap style={{flex: 1}}>
              Gatisheel
+           </Typography>
+           <Typography component="h1" variant="h6" color="inherit" noWrap >
+             Welcome {email}
            </Typography>
         </Toolbar>
       </AppBar>
@@ -146,10 +156,13 @@ export default function PersistentDrawerLeft() {
         }}
       >
         <div className={classes.drawerHeader}>
+        <ListItem style={{textAlign: 'center'}} button >
+              <ListItemText primary={role} />
+          </ListItem>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
-        </div>
+        </div>  
         <Divider />
         <List>       
              <ListItem button key={"Daily Report"} >
@@ -192,3 +205,10 @@ export default function PersistentDrawerLeft() {
     </div>
   );
 }
+
+const mapState = state => ({
+  email: state.loginReducer.user.user.email,
+  role: state.loginReducer.role,
+});
+
+export default connect(mapState)(NavBar);

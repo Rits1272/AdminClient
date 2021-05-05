@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -8,23 +8,23 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import NavBar from '../utils/NavBar';
-import { format } from 'date-fns';
 import Alert from '@material-ui/lab/Alert';
 import characterThree from '../utils/Images/characterThree.png';
-import {useHistory} from 'react-router-dom';
-
-// Firebase imports
-import firebase from '../Firebase';
-import "firebase/database";
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import { connect } from 'react-redux';
+import { getInspector, AddNewDrawing } from '../actions/addDrawingAction';
 
 function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Documentive
-      </Link>{' '}
-            {new Date().getFullYear()}
+            {'Gatisheel © '}
+            <Link color="inherit">
+                Gatisheel
+      </Link> 
+            {' '}{new Date().getFullYear()}
             {'.'}
         </Typography>
     );
@@ -58,20 +58,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function AddDrawing() {
+function AddDrawing(props) {
     const classes = useStyles();
     const [drawing, setDrawing] = useState("");
     const [inspector, setInspector] = useState("");
     const [quantity, setQuantity] = useState("");
     const [status, setStatus] = useState("Pending");
-    const [contact, setContact] = useState("");
-    const [description, setDescription] = useState("");
-
-    const history = useHistory();
-
-
     const [msg, setMsg] = useState("");
     const [type, setType] = useState("");
+    const { inspectors, dispatch, success } = props;
 
     const setValue = (e, type) => {
         e.preventDefault();
@@ -85,62 +80,53 @@ export default function AddDrawing() {
         else if (type === "status") {
             setStatus(val);
         }
-        else if (type === "contact") {
-            setContact(val);
-        }
         else if (type === "quantity") {
             setQuantity(val);
         }
-        else if (type === "description") {
-            setDescription(val);
-        }
     }
 
-    React.useEffect(() => {
-        firebase.auth().onAuthStateChanged(function(user){
-            if(!user){
-                history.push('/login')
-            }
-        })   
+    useEffect(() => {
+        dispatch(getInspector());
     }, []);
 
     const saveDetails = (e) => {
         e.preventDefault();
-        const ref = firebase.database().ref();
-        let date = format(new Date(), 'dd-MM-yyyy');
-        const itemref = ref.child(`item/${drawing}`);
 
-        try {
-            itemref.set({
-                date: date,
-                drawing_no: drawing,
-                inspector_name: inspector,
-                quantity: quantity,
-                status: status,
-                description: description,
-            });
-
-            setType("success");
-            setMsg("Drawing Number Added Successfully!")
-
-            setTimeout(() => {
-                setType("");
-                setMsg("");
-            }, 5000);
-
-            setDrawing("");
-            setContact("");
-            setQuantity("");
-            setDescription("");
-            setInspector("");
-            console.log("Drawing Number added successfully!")
-        }
-        catch (err) {
+        if(drawing === "" || inspector === "" || quantity === ""){
+            setMsg("Please enter valid details");
             setType("error");
-            setMsg("Something went wrong!")
-            console.log("Error saving drawing number", err);
+            return;
         }
+
+        dispatch(AddNewDrawing(drawing, inspector, inspectors[inspector], quantity)); // saves drawing to database
+
+        setTimeout(() => {
+            if(success){
+                setDrawing("");
+                setQuantity("");
+                setInspector("");
+     
+                setMsg("Drawing number added successfully");
+                setType("success");
+            }
+            else{
+                setMsg("Please enter correct details");
+                setType("error");
+            }
+        }, 1000);
+    
     }
+    
+    // Disappearing message after 5 seconds
+    const disappear = () => {
+        setTimeout(() => {
+            if(msg !== ""){
+                setMsg("");
+            }
+        }, 5000);
+    }
+
+    disappear();
 
     return (
         <div style={{ display: 'flex' }}>
@@ -167,26 +153,23 @@ export default function AddDrawing() {
                             autoFocus
                             onChange={(e) => setValue(e, "drawing")}
                         />
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            secondary
-                            value={inspector}
-                            label="Inspector Name"
-                            onChange={(e) => setValue(e, "inspector")}
-                        />
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            value={contact}
-                            label="Contact"
-                            type="string"
-                            onChange={(e) => setValue(e, "contact")}
-                        />
+                        <FormControl variant="outlined" margin="normal" fullWidth>
+                                <InputLabel id="demo-simple-select-outlined-label" margin="normal">Inspector</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select-outlined"
+                                    value={inspector}
+                                    label="Inspector"
+                                    fullWidth
+                                    onChange={e => setValue(e, "inspector")}
+                                >
+                                    {Object.keys(inspectors).map(key => {
+                                        return (
+                                            <MenuItem value={key}>{key}</MenuItem>
+                                        )
+                                    })}
+                                </Select>
+                        </FormControl>
                         <TextField
                             variant="outlined"
                             margin="normal"
@@ -194,20 +177,8 @@ export default function AddDrawing() {
                             value={quantity}
                             fullWidth
                             label="Quantity"
-                            type="number"
+                            type="string"
                             onChange={(e) => setValue(e, "quantity")}
-                        />
-                        <TextField
-                            id="outlined-multiline-static"
-                            label="Brief Description"
-                            margin="normal"
-                            required
-                            fullWidth
-                            multiline
-                            value={description}
-                            rows={3}
-                            variant="outlined"
-                            onChange={(e) => setValue(e, "description")}
                         />
                         <Button
                             type="submit"
@@ -226,3 +197,10 @@ export default function AddDrawing() {
         </div>
     );
 }
+
+const mapState = state => ({
+    inspectors: state.drawingReducer.inspector,
+    success: state.drawingReducer.success,
+});
+
+export default connect(mapState)(AddDrawing);   
