@@ -133,7 +133,7 @@ function AddDrawing(props) {
         return <Redirect to = "/login"/>
     }
 
-    if(role !== "Admin"){
+    if(role !== "admin"){
         return <Redirect to = "/notAllowed"/>
     }
 

@@ -92,7 +92,7 @@ function NavBar(props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); // siedbar open by default
   const history = useHistory();
-  let { email, role, dispatch, logoutSuccess } = props;
+  let { email, role, dispatch } = props;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -111,10 +111,6 @@ function NavBar(props) {
   const logoutUser = (e) => {
     dispatch(logout());
   }
-
-  useEffect(() => {
-    dispatch(userRole(email))
-  }, []);
 
   return (
     <div className={classes.root}>
@@ -161,7 +157,7 @@ function NavBar(props) {
           </IconButton>
         </div>
         <Divider />
-        {role === "Admin" && <List>
+        {role === "admin" && <List>
           <ListItem button key={"Daily Report"} >
             <ListItemIcon><AssignmentIcon color="secondary" /></ListItemIcon>
             <ListItemText onClick={() => navigate('home')} primary={"Daily Report"} />
@@ -199,7 +195,7 @@ function NavBar(props) {
         </List>
         }
 
-        {role === "Monitor" && <List>
+        {role === "monitor" && <List>
           <ListItem button key={"Daily Report"} >
             <ListItemIcon><AssignmentIcon color="secondary" /></ListItemIcon>
             <ListItemText onClick={() => navigate('home')} primary={"Daily Report"} />
@@ -223,7 +219,7 @@ function NavBar(props) {
         </List>
         }
 
-        {role === "Power User" && <List>
+        {role === "power user" && <List>
           <ListItem button key={"Inventory"} >
             <ListItemIcon><StoreMallDirectoryIcon color="secondary" /></ListItemIcon>
             <ListItemText onClick={() => navigate('inventory')} primary={"Inventory"} />
@@ -240,6 +236,13 @@ function NavBar(props) {
             <ListItemText onClick={logoutUser} primary={"Logout"} />
           </ListItem>
         </List>
+        }
+
+        {role === "" && 
+          <ListItem button key={"Logout"} >
+          <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
+          <ListItemText onClick={logoutUser} primary={"Logout"} />
+        </ListItem>
         }
       </Drawer>
     </div>

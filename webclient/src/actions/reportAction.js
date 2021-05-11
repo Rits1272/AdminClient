@@ -30,7 +30,6 @@ export const getDailyReport = (queryDate) => dispatch => {
         wait.then(() => dispatch(dailyReport(data)));
     }
     catch(err){
-        console.log(err)
         console.log("Unable to get daily report");
     }
 };

@@ -50,8 +50,10 @@ export const logout = () => {
 export const loginUser = (email, password) => dispatch => {
     dispatch(requestLogin());
     firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
-        user ? dispatch(receiveLogin(user)) : dispatch(loginError());
-    })
+        dispatch(receiveLogin(user));
+        return;
+    });
+    dispatch(loginError());
 };
 
 export const logoutUser = () => dispatch => {
@@ -65,74 +67,36 @@ export const userRole = (email) => dispatch => {
     const ref = firebase.database().ref();
 
     // Retrieving the role of the user
-    ref.child('admin').once("value", snap => {
+    ref.child('power_user').on("value", snap => {
         const data = snap.val();
         Object.keys(data).map(key => {
+            console.log(data[key]['reg_id']) 
+            console.log(email)
             if(data[key]["reg_id"] === email){
-                role = "admin";
+                role = "power user"
+                dispatch(getRole(role));
             }
         })
-    }).then(() => {
-        if(role !== ""){
-            role = role[0].toUpperCase() + role.slice(1);
-            dispatch(getRole(role));
-        }
     })
 
-    ref.child('inspector').once("value", snap => {
-        const data = snap.val();
+    ref.child('admin').on("value", snap => {
+        const data = snap.val();        
         Object.keys(data).map(key => {
             if(data[key]["reg_id"] === email){
-                role = "inspector"
+                role = "admin"
+                dispatch(getRole(role));
             }
         })
-    }).then(() => {
-        if(role !== ""){
-            role = role[0].toUpperCase() + role.slice(1);
-            dispatch(getRole(role));
-        }
     })
 
-    ref.child('custodian').once("value", snap => {
+    ref.child('monitor').on("value", snap => {
         const data = snap.val();
         Object.keys(data).map(key => {
             if(data[key]["reg_id"] === email){
-                role = "custodian";
+                role = "monitor"
+                dispatch(getRole(role));
             }
         })
-    }).then(() => {
-        if(role !== ""){
-            role = role[0].toUpperCase() + role.slice(1);
-            dispatch(getRole(role));
-        }
-    })
-
-    ref.child('power_user').once("value", snap => {
-        const data = snap.val();
-        Object.keys(data).map(key => {
-            if(data[key]["reg_id"] === email){
-                role = "Power User";
-            }
-        })
-    }).then(() => {
-        if(role !== ""){
-            role = role[0].toUpperCase() + role.slice(1);
-            dispatch(getRole(role));
-        }
-    })
-
-    ref.child('monitor').once("value", snap => {
-        const data = snap.val();
-        Object.keys(data).map(key => {
-            if(data[key]["reg_id"] === email){
-                role = "monitor";
-            }
-        })
-    }).then(() => {
-        if(role !== ""){
-            role = role[0].toUpperCase() + role.slice(1);
-            dispatch(getRole(role));
-        }
     })
 }
 

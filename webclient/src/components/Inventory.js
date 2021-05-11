@@ -86,7 +86,6 @@ function Inventory(props) {
     const { isAuthenticated, role } = props;
     const [s, setS] = useState(0); // workaround to rerender the update material state
 
-
     const [umaterial, setUmaterial] = useState([{ parameter: '', value: 'null' }]);
 
     const [updateOpen, setUpdateOpen] = useState(false);
@@ -227,7 +226,6 @@ function Inventory(props) {
         }
     }
 
-
     const removeMaterial = (param) => {
         let values = parameters;
         let updateValue = [];
@@ -269,7 +267,7 @@ function Inventory(props) {
         return <Redirect to='/login' />
     }
 
-    if (role !== "Admin" && role !== "Power User") {
+    if (role !== "admin" && role !== "power user") {
         return <Redirect to='/notAllowed' />
     }
 

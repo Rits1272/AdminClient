@@ -23,6 +23,8 @@ import { Redirect } from "react-router-dom";
 
 import { connect } from 'react-redux';
 import { getDailyReport } from '../actions/reportAction';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 const queryDate = () => {
     const today = new Date();
@@ -74,13 +76,12 @@ function Home(props) {
         return <Redirect to='/login' />
     }
 
-    const check = () => {
-        if(role !== "Admin" && role !== "Monitor"){
-            return <Redirect to='/notAllowed'/>
-        }    
+    if(role === "power user"){
+        return <Redirect to='/inventory'/>
     }
-
-    setTimeout(() => check(), 2000);
+    if(role !== "admin" && role !== "monitor"){
+        return <Redirect to='/notAllowed' />
+    }  
 
     return (
         <div style={{ display: 'flex' }}>

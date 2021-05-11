@@ -14,7 +14,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import NavBar from '../utils/NavBar';
 import characterOne from '../utils/Images/characterOne.png';
 import Alert from '@material-ui/lab/Alert';
-
 import { connect } from 'react-redux';
 import { AddNewRole } from '../actions/addNewRoleAction';
 import { Redirect } from 'react-router-dom';
@@ -25,9 +24,9 @@ function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
-            <Link color="inherit">
+            <Link href = '/privacy' color="inherit">
                 Gatisheel
-      </Link>{' '}
+      </Link> {' '}
             {new Date().getFullYear()}
             {'.'}
         </Typography>
@@ -135,7 +134,7 @@ function Register(props) {
         return <Redirect to = '/login'/>
     }
 
-    if(Role !== "Admin"){
+    if(Role !== "admin"){
         return <Redirect to = "/notAllowed" />
     }
 

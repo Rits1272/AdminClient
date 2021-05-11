@@ -14,7 +14,8 @@ import Alert from '@material-ui/lab/Alert';
 import { Redirect } from "react-router-dom";
 
 import { connect } from 'react-redux';
-import { loginUser } from '../actions/loginAction';
+import { loginUser, userRole } from '../actions/loginAction';
+import { CircularProgress } from 'material-ui';
 
 function Copyright() {
   return (
@@ -63,7 +64,7 @@ function Login (props) {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [msg, setMsg] = useState("");
-  const { loginError, isAuthenticated, dispatch } = props;
+  const { loginError, isAuthenticated, dispatch, role, loading } = props;
 
   const setValue = (e, type) => {
     e.preventDefault();
@@ -78,21 +79,20 @@ function Login (props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser(email, password));
-    if(loginError){
-      setMsg("Incorrect email or password!")
-    }
+
+    setTimeout(() => {
+      if(loginError){
+        setMsg("Incorrect email or password");
+      }
+    }, 1000);
   } 
 
-  const disappear = () => {
-    if (msg !== "") {
-      setTimeout(() => setMsg(""), 5000);
-    }
+  if(isAuthenticated && role !== ""){
+    return <Redirect to="/" />;
   }
 
-  disappear();
-
   if(isAuthenticated){
-    return <Redirect to="/" />;
+    dispatch(userRole(email));
   }
 
   return (
@@ -104,7 +104,7 @@ function Login (props) {
           <img src={CharacterTwo} />
           <Typography component="h1" variant="h5">
             Sign in
-        </Typography>
+          </Typography>
           {
             msg !== "" && <Alert style={{marginTop: 20}} severity={"error"}>{msg}</Alert>
           }
@@ -151,6 +151,7 @@ function Login (props) {
               </Grid>
             </Grid>
           </form>
+          {loading && <CircularProgress color="secondary"/>}
         </div>
         <Box mt={8}>
           <Copyright />
@@ -165,6 +166,8 @@ const mapState = state => {
     isLogginIn: state.loginReducer.isLogginIn,
     loginError: state.loginReducer.loginError,
     isAuthenticated: state.loginReducer.isAuthenticated,
+    role: state.loginReducer.role,
+    loading: state.loginReducer.isLogginIn,
   };
 }
 

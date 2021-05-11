@@ -34,6 +34,7 @@ const loginReducer = (state = initialState, action) => {
                 isLoggingIn: false,
                 isAuthenticated: true,
                 user: action.user,
+                loginError: false,
             };
         case LOGIN_FAILURE:
             return {

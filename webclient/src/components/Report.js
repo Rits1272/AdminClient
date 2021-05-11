@@ -284,7 +284,7 @@ function Report(props) {
     return <Redirect to = '/login' />
   }
   
-  if(role !== "Admin" && role !== "Monitor"){
+  if(role !== "admin" && role !== "monitor"){
     return <Redirect to = '/notAllowed' />
   }
 
