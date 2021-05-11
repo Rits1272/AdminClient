@@ -14,6 +14,7 @@ The admin client currently exposes the following functionalities for the user:
 
 Tech Stack:
   - React
+  - Redux
   - React Apex Charts
   - Firebase
 
