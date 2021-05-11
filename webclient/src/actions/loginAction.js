@@ -5,6 +5,7 @@ import {
     LOGIN_SUCCESS,
     RESET_PASSWORD,
     GET_ROLE,
+    INITIATE_LOGOUT,
 } from '../types';
 
 export const requestLogin = () => {
@@ -39,6 +40,12 @@ export const getRole = (role) => {
     };
 }
 
+export const logout = () => {
+    return {
+        type: INITIATE_LOGOUT,
+    };
+}
+
 export const loginUser = (email, password) => dispatch => {
     dispatch(requestLogin());
     firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
@@ -46,10 +53,16 @@ export const loginUser = (email, password) => dispatch => {
     })
 };
 
+export const logoutUser = () => dispatch => {
+    firebase.auth().signOut();
+    dispatch(logout());
+}
+
 export const userRole = (email) => dispatch => {
-    let role;
+    let role = "";
     const ref = firebase.database().ref();
 
+    // Retrieving the role of the user
     ref.child('admin').once("value", snap => {
         const data = snap.val();
         Object.keys(data).map(key => {
@@ -57,6 +70,11 @@ export const userRole = (email) => dispatch => {
                 role = "admin";
             }
         })
+    }).then(() => {
+        if(role !== ""){
+            role = role[0].toUpperCase() + role.slice(1);
+            dispatch(getRole(role));
+        }
     })
 
     ref.child('inspector').once("value", snap => {
@@ -66,6 +84,11 @@ export const userRole = (email) => dispatch => {
                 role = "inspector"
             }
         })
+    }).then(() => {
+        if(role !== ""){
+            role = role[0].toUpperCase() + role.slice(1);
+            dispatch(getRole(role));
+        }
     })
 
     ref.child('custodian').once("value", snap => {
@@ -75,15 +98,43 @@ export const userRole = (email) => dispatch => {
                 role = "custodian";
             }
         })
+    }).then(() => {
+        if(role !== ""){
+            role = role[0].toUpperCase() + role.slice(1);
+            dispatch(getRole(role));
+        }
     })
 
-    // Using timeout to avoid async issues
-    setTimeout(() => {
-        role = role[0].toUpperCase() + role.slice(1);
-        dispatch(getRole(role));
-    }, 2000);
+    ref.child('power_user').once("value", snap => {
+        const data = snap.val();
+        Object.keys(data).map(key => {
+            if(data[key]["reg_id"] === email){
+                role = "Power user";
+            }
+        })
+    }).then(() => {
+        if(role !== ""){
+            role = role[0].toUpperCase() + role.slice(1);
+            dispatch(getRole(role));
+        }
+    })
+
+    ref.child('monitor').once("value", snap => {
+        const data = snap.val();
+        Object.keys(data).map(key => {
+            if(data[key]["reg_id"] === email){
+                role = "monitor";
+            }
+        })
+    }).then(() => {
+        if(role !== ""){
+            role = role[0].toUpperCase() + role.slice(1);
+            dispatch(getRole(role));
+        }
+    })
 }
 
+// Send Reset mail to the user
 export const resetPassword = (email) => dispatch => {
     firebase.auth().sendPasswordResetEmail(email).then(dispatch(reset()));
 }

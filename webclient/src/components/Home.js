@@ -19,6 +19,7 @@ import BarChartRoundedIcon from '@material-ui/icons/BarChartRounded';
 import FitnessCenterRoundedIcon from '@material-ui/icons/FitnessCenterRounded';
 import landscape from '../utils/Images/landscape.png';
 import Typography from '@material-ui/core/Typography';
+import { Redirect } from "react-router-dom";
 
 import { connect } from 'react-redux';
 import { getDailyReport } from '../actions/reportAction';
@@ -63,13 +64,18 @@ const useStyles = makeStyles({
 function Home(props) {
     const classes = useStyles();
     const { data } = props;
-    const { mapDispatch, dispatch } = props;
+    const { dispatch, isAuthenticated } = props;
     
     useEffect(() => {
+        console.log("IS AUTHENTICATED", isAuthenticated);
         dispatch(getDailyReport(queryDate()))
         const time = 1000 * 60 * 5; // polls in every 5 minutes
         setInterval(() => dispatch(getDailyReport(queryDate())), time);
     }, []);
+    
+    if(!isAuthenticated){
+        return <Redirect to='/login' />
+    }
 
     return (
         <div style={{ display: 'flex' }}>
@@ -126,6 +132,7 @@ function Home(props) {
 
 const mapState = state => ({
     data : state.reportReducer.data,
+    isAuthenticated: state.loginReducer.isAuthenticated,
 })
 
 export default connect(mapState)(Home);

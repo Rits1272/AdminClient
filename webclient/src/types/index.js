@@ -3,6 +3,7 @@ export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const RESET_PASSWORD = 'RESET_PASSWORD';
+export const INITIATE_LOGOUT = 'INITIATE_LOGOUT';
 export const GET_ROLE = "GET_ROLE";
 
 export const ADD_ROLE = 'ADD_ROLE';

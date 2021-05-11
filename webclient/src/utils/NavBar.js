@@ -23,10 +23,10 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useHistory } from 'react-router-dom';
-import firebase from '../Firebase';
+import { Redirect } from "react-router-dom";
 
 import { connect } from 'react-redux';
-import { loginAction, userRole } from '../actions/loginAction';
+import { logout, userRole } from '../actions/loginAction';
 
 const drawerWidth = 240;
 
@@ -93,7 +93,7 @@ function NavBar(props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); // siedbar open by default
   const history = useHistory();
-  let {  email, role, dispatch } = props;
+  let {  email, role, dispatch, logoutSuccess } = props;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -110,14 +110,16 @@ function NavBar(props) {
   }
 
   const logoutUser = (e) => {
-    e.preventDefault();
-    firebase.auth().signOut();
-    history.push("/login");
+    dispatch(logout());
   }
 
   useEffect(() => {
     dispatch(userRole(email))
   }, []);
+
+  // if(logoutSuccess){
+  //   return <Redirect to="/login" />;
+  // }
 
   return (
     <div className={classes.root}>
@@ -199,7 +201,6 @@ function NavBar(props) {
               <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
               <ListItemText onClick={logoutUser} primary={"Logout"} />
             </ListItem>
-           
         </List>
       </Drawer>
     </div>
@@ -209,6 +210,7 @@ function NavBar(props) {
 const mapState = state => ({
   email: state.loginReducer.user.user.email,
   role: state.loginReducer.role,
+  logoutSuccess: state.loginReducer.logoutSuccess,
 });
 
 export default connect(mapState)(NavBar);

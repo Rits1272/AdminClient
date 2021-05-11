@@ -19,6 +19,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Alert from '@material-ui/lab/Alert';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import { useHistory } from 'react-router-dom';
 
 
@@ -34,7 +36,7 @@ const useStyles = makeStyles({
     },
     form: {
         width: '100%', // Fix IE 11 issue.
-        
+
     },
     paper: {
         marginTop: 10,
@@ -98,9 +100,9 @@ export default function Inventory() {
 
     const handleRemoveFields = index => {
         const values = [...newMaterial];
-       if(values.length === 1){
-           return;
-       }
+        if (values.length === 1) {
+            return;
+        }
         values.splice(index, 1);
         setNewMaterial(values);
     }
@@ -112,7 +114,7 @@ export default function Inventory() {
     }
 
     const saveParameters = () => {
-        if(name === ""){
+        if (name === "") {
             setMsg("Please enter valid material name");
             setType("error");
             return;
@@ -121,17 +123,17 @@ export default function Inventory() {
         newMaterial.map((item, index) => {
             obj[item.parameter] = item.value;
         });
-        try{
+        try {
             const ref = firebase.database().ref();
             ref.child(`inventory/${name}`).set(obj);
             setMsg("Material added to inventory successfully!")
             setType("success");
         }
-        catch(err){
+        catch (err) {
             setType("error");
             setMsg("Something went wrong. Please check if all the details are valid!")
         }
-        finally{
+        finally {
             handleClose();
         }
     }
@@ -140,11 +142,11 @@ export default function Inventory() {
         e.preventDefault();
         const ref = firebase.database().ref();
         const obj = data[activeMaterial];
-        try{
+        try {
             ref.child(`inventory/${activeMaterial}`).set(obj);
             setMsg("Data values updated sucessfully!")
         }
-        catch(err){
+        catch (err) {
             setMsg("Unable to update data values!")
         }
         return;
@@ -157,14 +159,14 @@ export default function Inventory() {
     }
 
     const disappear = () => {
-        if(msg !== ""){
+        if (msg !== "") {
             setTimeout(() => setMsg(""), 5000);
         }
     }
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged(function(user){
-            if(!user){
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (!user) {
                 history.push('/login')
             }
         })
@@ -202,7 +204,7 @@ export default function Inventory() {
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title" style={{ minWidth: 500 }}>Add Material</DialogTitle>
                 {
-                         msg !== "" ? <Alert severity={type}>{msg}</Alert> : <div></div>
+                    msg !== "" ? <Alert severity={type}>{msg}</Alert> : <div></div>
                 }
                 <DialogContent>
                     <TextField
@@ -255,9 +257,9 @@ export default function Inventory() {
                             Inventory
                         </Typography>
                         {
-                         msg !== "" ? <Alert severity={type}>{msg}</Alert> : <div></div>
+                            msg !== "" ? <Alert severity={type}>{msg}</Alert> : <div></div>
                         }
-                        <form className={classes.form} style={{marginTop: 25}}>
+                        <form className={classes.form} style={{ marginTop: 25 }}>
                             <FormControl variant="outlined" margin="normal" fullWidth>
                                 <InputLabel id="demo-simple-select-outlined-label" margin="normal">Select Material</InputLabel>
                                 <Select
@@ -285,11 +287,12 @@ export default function Inventory() {
                                             fullWidth
                                             label={item}
                                             autoFocus
-                                            onChange = {(e) => updateParameter(e, item)}
+                                            onChange={(e) => updateParameter(e, item)}
                                         />
                                     )
                                 })
                             }
+
                             {activeMaterial !== "" &&
                                 <Button
                                     type="submit"
@@ -297,8 +300,17 @@ export default function Inventory() {
                                     color="secondary"
                                     variant="contained"
                                     className={classes.submit}
-                                    onClick = {e => saveDetails(e)}
+                                    onClick={e => saveDetails(e)}
                                 >Submit</Button>}
+                            {activeMaterial !== "" &&
+                                <Grid container style={{marginTop: 10}}>
+                                    <Grid item>
+                                        <Link href="/reset" variant="body2" color="secondary">
+                                            {"Update?"}
+                                        </Link>
+                                    </Grid>
+                                </Grid>
+                            }
                         </form>
                     </div>
                 </Container>

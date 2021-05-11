@@ -4,6 +4,7 @@ import {
     LOGIN_SUCCESS,
     RESET_PASSWORD,
     GET_ROLE,
+    INITIATE_LOGOUT,
 } from '../types';
 
 const initialState = {
@@ -16,6 +17,7 @@ const initialState = {
     linkSent: false,
     user: {},
     role: "",
+    logoutSuccess: false,
 };
 
 const loginReducer = (state = initialState, action) => {
@@ -49,6 +51,15 @@ const loginReducer = (state = initialState, action) => {
             return {
                 ...state,
                 role: action.role,
+            }
+        case INITIATE_LOGOUT:
+            return {
+                ...state,
+                logoutSuccess: true,
+                isAuthenticated: false,
+                user: {},
+                role: "",
+                isLoggingOut: true,
             }
         default:
             return state;

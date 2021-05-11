@@ -13,22 +13,27 @@ import Employees from '../src/components/Employees';
 import {Switch, BrowserRouter as Router, Route} from 'react-router-dom';
 
 import { Provider } from 'react-redux';
-import store from './store';
+import PersistorStore from './store';
+import { PersistGate } from 'redux-persist/integration/react';
+
+const { store, persistor } = PersistorStore();
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router>
-      <Switch>
-        <Route path='/reset' component={Reset}/>
-        <Route path='/login' component={Login}/>
-        <Route path='/register' component={Register}/>
-        <Route path='/AddDrawing' component={AddDrawing}/>
-        <Route path='/report' component={Report}/> 
-        <Route path='/employees' component={Employees}/>
-        <Route path='/inventory' component={Inventory}/>
-        <Route path='/' component={Home}/>
-      </Switch>
-    </Router>
+    <PersistGate loading={null} persistor={persistor}>
+      <Router>
+        <Switch>
+          <Route path='/reset' component={Reset}/>
+          <Route path='/login' component={Login}/>
+          <Route path='/register' component={Register}/>
+          <Route path='/AddDrawing' component={AddDrawing}/>
+          <Route path='/report' component={Report}/> 
+          <Route path='/employees' component={Employees}/>
+          <Route path='/inventory' component={Inventory}/>
+          <Route path='/' component={Home}/>
+        </Switch>
+      </Router>
+    </PersistGate>
     </Provider>, document.getElementById('root')
 );
 
