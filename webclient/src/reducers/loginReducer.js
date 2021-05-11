@@ -59,7 +59,6 @@ const loginReducer = (state = initialState, action) => {
                 isAuthenticated: false,
                 user: {},
                 role: "",
-                isLoggingOut: true,
             }
         default:
             return state;

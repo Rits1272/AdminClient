@@ -30,7 +30,9 @@ import Chip from '@material-ui/core/Chip';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import SearchIcon from '@material-ui/icons/Search';
-import {useHistory} from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
+
+import { connect } from 'react-redux';
 
 const useStyles = makeStyles({
   table: {
@@ -62,7 +64,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function Report() {
+function Report(props) {
   const classes = useStyles();
 
   const [rows, setRows] = useState([]);
@@ -73,6 +75,8 @@ export default function Report() {
   const [acceptedDate, setAcceptedDate] = useState([]);
   const [rejectetDate, setrejectetDate] = useState([]);
   const [quantityDate, setQuantityDate] = useState([]);
+
+  const { isAuthenticated, role } = props;
 
   const history = useHistory();
 
@@ -276,15 +280,13 @@ export default function Report() {
     doc.save(`${month}_${year}_report.pdf`)
   }
 
-  useEffect(() => {
-    firebase.auth().onAuthStateChanged(function(user){
-      if(!user){
-          history.push('/login')
-      }
-  })
-    fetchDetails();
-  }, []);
-
+  if(!isAuthenticated){
+    return <Redirect to = '/login' />
+  }
+  
+  if(role !== "Admin" && role !== "Monitor"){
+    return <Redirect to = '/notAllowed' />
+  }
 
   return (
     <div style={{ display: 'flex' }}>
@@ -419,3 +421,10 @@ export default function Report() {
     </div >
   );
 }
+
+const mapState = state => ({
+  isAuthenticated: state.loginReducer.isAuthenticated,
+  role: state.loginReducer.role,
+})
+
+export default connect(mapState)(Report);

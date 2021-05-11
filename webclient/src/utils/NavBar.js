@@ -23,7 +23,6 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { useHistory } from 'react-router-dom';
-import { Redirect } from "react-router-dom";
 
 import { connect } from 'react-redux';
 import { logout, userRole } from '../actions/loginAction';
@@ -39,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)', 
+    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
   },
   appBarShift: {
     width: `calc(100% - ${drawerWidth}px)`,
@@ -93,7 +92,7 @@ function NavBar(props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); // siedbar open by default
   const history = useHistory();
-  let {  email, role, dispatch, logoutSuccess } = props;
+  let { email, role, dispatch, logoutSuccess } = props;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -117,10 +116,6 @@ function NavBar(props) {
     dispatch(userRole(email))
   }, []);
 
-  // if(logoutSuccess){
-  //   return <Redirect to="/login" />;
-  // }
-
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -140,12 +135,12 @@ function NavBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap style={{flex: 1}}>
-             Gatisheel
+          <Typography component="h1" variant="h6" color="inherit" noWrap style={{ flex: 1 }}>
+            Gatisheel
            </Typography>
-           <Typography component="h1" variant="h6" color="inherit" noWrap >
-             Welcome {email}
-           </Typography>
+          <Typography component="h1" variant="h6" color="inherit" noWrap >
+            Welcome {email}
+          </Typography>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -158,50 +153,94 @@ function NavBar(props) {
         }}
       >
         <div className={classes.drawerHeader}>
-        <ListItem style={{textAlign: 'center'}} button >
-              <ListItemText primary={role} />
+          <ListItem style={{ textAlign: 'center' }} button >
+            <ListItemText primary={role} />
           </ListItem>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
-        </div>  
+        </div>
         <Divider />
-        <List>       
-             <ListItem button key={"Daily Report"} >
-              <ListItemIcon><AssignmentIcon color="secondary" /></ListItemIcon>
-              <ListItemText onClick={() => navigate('home')} primary={"Daily Report"} />
-            </ListItem>
+        {role === "Admin" && <List>
+          <ListItem button key={"Daily Report"} >
+            <ListItemIcon><AssignmentIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('home')} primary={"Daily Report"} />
+          </ListItem>
 
-            <ListItem button key={"Add New Roles"} >
-              <ListItemIcon><PersonAddIcon color="secondary" /></ListItemIcon>
-              <ListItemText onClick={() => navigate('register')} primary={"Add New Roles"} />
-            </ListItem>
+          <ListItem button key={"Add New Roles"} >
+            <ListItemIcon><PersonAddIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('register')} primary={"Add New Roles"} />
+          </ListItem>
 
-            <ListItem button key={"Add Drawings"} >
-              <ListItemIcon><InboxIcon color="secondary" /></ListItemIcon>
-              <ListItemText onClick={() => navigate('AddDrawing')} primary={"Add Drawings"} />
-            </ListItem>
+          <ListItem button key={"Add Drawings"} >
+            <ListItemIcon><InboxIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('AddDrawing')} primary={"Add Drawings"} />
+          </ListItem>
 
-            <ListItem button key={"Monthly Report"} >
-              <ListItemIcon><AssignmentTurnedInIcon color="secondary" /></ListItemIcon>
-              <ListItemText onClick={() => navigate('report')} primary={"Monthly Report"} />
-            </ListItem>
+          <ListItem button key={"Monthly Report"} >
+            <ListItemIcon><AssignmentTurnedInIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('report')} primary={"Monthly Report"} />
+          </ListItem>
 
-            <ListItem button key={"Inventory"} >
-              <ListItemIcon><StoreMallDirectoryIcon color="secondary"  /></ListItemIcon>
-              <ListItemText onClick={() => navigate('inventory')} primary={"Inventory"} />
-            </ListItem>
+          <ListItem button key={"Inventory"} >
+            <ListItemIcon><StoreMallDirectoryIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('inventory')} primary={"Inventory"} />
+          </ListItem>
 
-            <ListItem button key={"Employees"} >
-              <ListItemIcon><PeopleIcon color="secondary" /></ListItemIcon>
-              <ListItemText onClick={() => navigate('employees')} primary={"Employees"} />
-            </ListItem>
-            <Divider/>
-            <ListItem button key={"Logout"} >
-              <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
-              <ListItemText onClick={logoutUser} primary={"Logout"} />
-            </ListItem>
+          <ListItem button key={"Employees"} >
+            <ListItemIcon><PeopleIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('employees')} primary={"Employees"} />
+          </ListItem>
+          <Divider />
+          <ListItem button key={"Logout"} >
+            <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={logoutUser} primary={"Logout"} />
+          </ListItem>
         </List>
+        }
+
+        {role === "Monitor" && <List>
+          <ListItem button key={"Daily Report"} >
+            <ListItemIcon><AssignmentIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('home')} primary={"Daily Report"} />
+          </ListItem>
+
+          <ListItem button key={"Monthly Report"} >
+            <ListItemIcon><AssignmentTurnedInIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('report')} primary={"Monthly Report"} />
+          </ListItem>
+
+          <ListItem button key={"Employees"} >
+            <ListItemIcon><PeopleIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('employees')} primary={"Employees"} />
+          </ListItem>
+          <Divider />
+
+          <ListItem button key={"Logout"} >
+            <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={logoutUser} primary={"Logout"} />
+          </ListItem>
+        </List>
+        }
+
+        {role === "Power User" && <List>
+          <ListItem button key={"Inventory"} >
+            <ListItemIcon><StoreMallDirectoryIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('inventory')} primary={"Inventory"} />
+          </ListItem>
+
+          <ListItem button key={"Employees"} >
+            <ListItemIcon><PeopleIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={() => navigate('employees')} primary={"Employees"} />
+          </ListItem>
+          <Divider />
+
+          <ListItem button key={"Logout"} >
+            <ListItemIcon><ExitToAppIcon color="secondary" /></ListItemIcon>
+            <ListItemText onClick={logoutUser} primary={"Logout"} />
+          </ListItem>
+        </List>
+        }
       </Drawer>
     </div>
   );

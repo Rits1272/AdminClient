@@ -20,7 +20,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit">
+      <Link href = '/privacy' color="inherit">
         Gatisheel
       </Link>{' '}
       {new Date().getFullYear()}

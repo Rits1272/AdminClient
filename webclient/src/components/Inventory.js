@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useDebugValue } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import NavBar from '../utils/NavBar';
 import Button from '@material-ui/core/Button';
@@ -21,8 +21,9 @@ import Alert from '@material-ui/lab/Alert';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
-import { useHistory } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
+import { connect } from 'react-redux';
 
 const useStyles = makeStyles({
     formControl: {
@@ -71,7 +72,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function Inventory() {
+function Inventory(props) {
     const classes = useStyles();
     const [data, setData] = useState();
     const [parameters, setParameters] = useState({});
@@ -82,7 +83,21 @@ export default function Inventory() {
     const [name, setName] = useState("");
     const [msg, setMsg] = useState("");
     const [type, setType] = useState();
-    const history = useHistory();
+    const { isAuthenticated, role } = props;
+    const [s, setS] = useState(0); // workaround to rerender the update material state
+
+
+    const [umaterial, setUmaterial] = useState([{ parameter: '', value: 'null' }]);
+
+    const [updateOpen, setUpdateOpen] = useState(false);
+
+    const handleUpdateOpen = () => {
+        setUpdateOpen(true);
+    }
+
+    const handleUpdateClose = () => {
+        setUpdateOpen(false);
+    }
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -98,6 +113,19 @@ export default function Inventory() {
         setNewMaterial(values);
     }
 
+    const handleUpdateAddFields = () => {
+        const values = [...umaterial];
+        values.push({parameter: '', value: 'null'});
+        setUmaterial(values);
+    }
+
+    const handleUpdateRemoveField = (index) => {
+        const values = [...umaterial];
+        if(values.length == 1) return;
+        values.splice(index, 1);
+        setUmaterial(values);
+    }
+
     const handleRemoveFields = index => {
         const values = [...newMaterial];
         if (values.length === 1) {
@@ -111,6 +139,40 @@ export default function Inventory() {
         const values = [...newMaterial];
         values[index]['parameter'] = event.target.value;
         setNewMaterial(values);
+    }
+
+    const handleUpdateInputChange = (index, event) => {
+        const values = umaterial;
+        values[index]['parameter'] = event.target.value;
+        setUmaterial(values);
+    }
+
+    const saveUpdateMaterial = () => {
+        const values = parameters
+        Object.keys(umaterial).map(key => {
+            if(umaterial[key] !== ""){
+                values[activeMaterial].push(umaterial[key]['parameter']);
+            }
+        })
+        setParameters(values)
+        const obj = {};
+        parameters[activeMaterial].map(item => {
+            if(item !== ""){
+                obj[item] = data[activeMaterial][item] || "null";
+            }
+        })
+        try{
+            const ref = firebase.database().ref();
+            ref.child(`inventory/${activeMaterial}`).set(obj);
+            setMsg("Parameters updated succesfully");
+            setType("success");
+        }
+        catch(err){
+            setMsg("Something went wrong!");
+            setType("error");
+        }
+        const init = [{ parameter: '', value: 'null' }];
+        setUmaterial(init);
     }
 
     const saveParameters = () => {
@@ -156,6 +218,7 @@ export default function Inventory() {
         const tmp = data;
         tmp[activeMaterial][param] = e.target.value;
         setData(tmp);
+        setS(Math.random(100000));
     }
 
     const disappear = () => {
@@ -164,12 +227,21 @@ export default function Inventory() {
         }
     }
 
-    useEffect(() => {
-        firebase.auth().onAuthStateChanged(function (user) {
-            if (!user) {
-                history.push('/login')
+
+    const removeMaterial = (param) => {
+        let values = parameters;
+        let updateValue = [];
+        values[activeMaterial].map(item => {
+            if(item !== param){
+                updateValue.push(item);
             }
         })
+        values[activeMaterial] = updateValue;
+        setParameters(values);
+        setS(Math.random(10000));
+    }
+
+    useEffect(() => {
         const ref = firebase.database().ref();
         const inventoryRef = ref.child('inventory');
 
@@ -193,7 +265,16 @@ export default function Inventory() {
         })
     }, []);
 
+    if (!isAuthenticated) {
+        return <Redirect to='/login' />
+    }
+
+    if (role !== "Admin" && role !== "Power User") {
+        return <Redirect to='/notAllowed' />
+    }
+
     disappear();
+
     return (
         <div style={{ display: 'flex' }}>
             <CssBaseline />
@@ -217,14 +298,14 @@ export default function Inventory() {
                         fullWidth
                         onChange={e => setName(e.target.value)}
                     />
-                    {newMaterial.map((field, index) => {
+                    {newMaterial && newMaterial.map((field, index) => {
                         return (
                             <div style={{ display: 'flex', flexDirection: 'row' }}>
                                 <TextField
                                     margin="normal"
                                     variant="outlined"
                                     label="Parameter"
-                                    value={newMaterial[index].parameter}
+                                    value={updateParameter[index]}
                                     fullWidth
                                     onChange={e => handleInputChange(index, e)}
                                     style={{ marginRight: 10 }}
@@ -241,14 +322,56 @@ export default function Inventory() {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                        Cancel
-          </Button>
-                    <Button onClick={saveParameters} color="secondary">
-                        Save
-          </Button>
+                    <Button onClick={handleClose} color="primary">Cancel</Button>
+                    <Button onClick={saveParameters} color="secondary">Save</Button>
                 </DialogActions>
             </Dialog>
+
+            {/* to update existing parameters */}
+            <Dialog open={updateOpen} onClose={handleUpdateOpen} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title" style={{ minWidth: 500 }}>{activeMaterial}</DialogTitle>
+                {
+                    msg !== "" ? <Alert severity={type}>{msg}</Alert> : <div></div>
+                }
+                <DialogContent>
+                    {activeMaterial !== "" && parameters[activeMaterial] !== undefined && parameters[activeMaterial].map((item, index) => {
+                        if(item !== ""){
+                            return (
+                                <div style={{display: 'flex'}}>
+                                    <MenuItem style={{float: 'left'}} value={item}>{item}</MenuItem>
+                                    <Button type="submit" onClick={() => removeMaterial(item)} style={{float: 'left'}} color="secondary">Remove</Button>
+                                </div>
+                            )
+                        }
+                    })}
+                    {umaterial && umaterial.map((item, index) => {
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                <TextField
+                                    margin="normal"
+                                    variant="outlined"
+                                    label="Parameter"
+                                    fullWidth
+                                    onChange={e => handleUpdateInputChange(index, e)}
+                                    style={{ marginRight: 10 }}
+                                />
+                                <Button onClick={() => handleUpdateAddFields()} margin="dense" raised color="primary" variant="outlined" color="secondary" style={{ marginTop: 15, marginBottom: 10, marginRight: 5, fontSize: 20 }}>
+                                    +
+                                </Button>
+                                <Button onClick={() => handleUpdateRemoveField(index)} color="primary" variant="outlined" color="secondary" style={{ marginTop: 15, marginBottom: 10, fontSize: 25 }}>
+                                    -
+                                </Button>
+                            </div>
+                        )
+                    })}
+
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleUpdateClose} color="primary">Cancel</Button>
+                    <Button onClick={saveUpdateMaterial} color="secondary">Save</Button>
+                </DialogActions>
+            </Dialog>
+
             <div className={classes.inputDiv}>
                 <Container component="main" maxWidth="xs">
                     <div className={classes.paper}>
@@ -270,14 +393,14 @@ export default function Inventory() {
                                     fullWidth
                                     onChange={e => setActiveMaterial(e.target.value)}
                                 >
-                                    {material.map(item => {
+                                    {material && material.map(item => {
                                         return (
                                             <MenuItem value={item}>{item}</MenuItem>
                                         )
                                     })}
                                 </Select>
                             </FormControl>
-                            {activeMaterial !== "" &&
+                            {activeMaterial !== "" && parameters[activeMaterial] &&
                                 parameters[activeMaterial].map(item => {
                                     return (
                                         <TextField
@@ -287,12 +410,12 @@ export default function Inventory() {
                                             fullWidth
                                             label={item}
                                             autoFocus
+                                            value={data[activeMaterial][item]}
                                             onChange={(e) => updateParameter(e, item)}
                                         />
                                     )
                                 })
                             }
-
                             {activeMaterial !== "" &&
                                 <Button
                                     type="submit"
@@ -303,9 +426,9 @@ export default function Inventory() {
                                     onClick={e => saveDetails(e)}
                                 >Submit</Button>}
                             {activeMaterial !== "" &&
-                                <Grid container style={{marginTop: 10}}>
+                                <Grid container style={{ marginTop: 10 }}>
                                     <Grid item>
-                                        <Link href="/reset" variant="body2" color="secondary">
+                                        <Link onClick={handleUpdateOpen} variant="body2" color="secondary">
                                             {"Update?"}
                                         </Link>
                                     </Grid>
@@ -314,8 +437,14 @@ export default function Inventory() {
                         </form>
                     </div>
                 </Container>
-
             </div>
         </div>
     )
 }
+
+const mapState = state => ({
+    isAuthenticated: state.loginReducer.isAuthenticated,
+    role: state.loginReducer.role,
+})
+
+export default connect(mapState)(Inventory);

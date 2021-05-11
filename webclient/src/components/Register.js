@@ -17,6 +17,7 @@ import Alert from '@material-ui/lab/Alert';
 
 import { connect } from 'react-redux';
 import { AddNewRole } from '../actions/addNewRoleAction';
+import { Redirect } from 'react-router-dom';
 
 var generator = require('generate-password');
 
@@ -69,7 +70,7 @@ function Register(props) {
     const [role, setRole] = useState("");
     const [msg, setMsg] = useState("");
     const [type, setType] = useState("success");
-    const { success, dispatch } = props;
+    const { success, dispatch, isAuthenticated, Role } = props;
 
     const validEmail = (email) => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -128,6 +129,14 @@ function Register(props) {
             setMsg("Some unknown error occurred");
             setType("error");
         }       
+    }
+
+    if(!isAuthenticated){
+        return <Redirect to = '/login'/>
+    }
+
+    if(Role !== "Admin"){
+        return <Redirect to = "/notAllowed" />
     }
 
     disappear();
@@ -212,10 +221,10 @@ function Register(props) {
     );
 }
 
-const mapState = state => {
-    return {
-        success: state.addNewRoleReducer.success,
-    }
-}
+const mapState = state => ({
+    success: state.addNewRoleReducer.success,
+    isAuthenticated: state.loginReducer.isAuthenticated,
+    Role: state.loginReducer.role,
+})
 
 export default connect(mapState)(Register);

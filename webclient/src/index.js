@@ -9,6 +9,8 @@ import AddDrawing from '../src/components/AddDrawing';
 import Report from '../src/components/Report';
 import Inventory from '../src/components/Inventory';
 import Employees from '../src/components/Employees';
+import NotAllowed from '../src/components/NotAllowed';
+import Privacy from '../src/components/Privacy'; 
   
 import {Switch, BrowserRouter as Router, Route} from 'react-router-dom';
 
@@ -30,6 +32,8 @@ ReactDOM.render(
           <Route path='/report' component={Report}/> 
           <Route path='/employees' component={Employees}/>
           <Route path='/inventory' component={Inventory}/>
+          <Route path='/privacy' component={Privacy}/>
+          <Route path='/notAllowed' component={NotAllowed}/>
           <Route path='/' component={Home}/>
         </Switch>
       </Router>

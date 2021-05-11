@@ -16,12 +16,13 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import { connect } from 'react-redux';
 import { getInspector, AddNewDrawing } from '../actions/addDrawingAction';
+import { Redirect } from 'react-router-dom';
 
 function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
             {'Gatisheel © '}
-            <Link color="inherit">
+            <Link href = '/privacy' color="inherit">
                 Gatisheel
       </Link> 
             {' '}{new Date().getFullYear()}
@@ -66,7 +67,7 @@ function AddDrawing(props) {
     const [status, setStatus] = useState("Pending");
     const [msg, setMsg] = useState("");
     const [type, setType] = useState("");
-    const { inspectors, dispatch, success } = props;
+    const { inspectors, dispatch, success, isAuthenticated, role } = props;
 
     const setValue = (e, type) => {
         e.preventDefault();
@@ -127,6 +128,14 @@ function AddDrawing(props) {
     }
 
     disappear();
+
+    if(!isAuthenticated){
+        return <Redirect to = "/login"/>
+    }
+
+    if(role !== "Admin"){
+        return <Redirect to = "/notAllowed"/>
+    }
 
     return (
         <div style={{ display: 'flex' }}>
@@ -201,6 +210,8 @@ function AddDrawing(props) {
 const mapState = state => ({
     inspectors: state.drawingReducer.inspector,
     success: state.drawingReducer.success,
+    isAuthenticated: state.loginReducer.isAuthenticated,
+    role: state.loginReducer.role,
 });
 
 export default connect(mapState)(AddDrawing);   

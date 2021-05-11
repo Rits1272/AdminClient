@@ -1,4 +1,5 @@
 import firebase from '../Firebase';
+import storage from 'redux-persist/lib/storage'
 import {
     LOGIN_FAILURE,
     LOGIN_REQUEST,
@@ -55,6 +56,7 @@ export const loginUser = (email, password) => dispatch => {
 
 export const logoutUser = () => dispatch => {
     firebase.auth().signOut();
+    storage.removeItem('persist:root'); // Terminating user session
     dispatch(logout());
 }
 
@@ -109,7 +111,7 @@ export const userRole = (email) => dispatch => {
         const data = snap.val();
         Object.keys(data).map(key => {
             if(data[key]["reg_id"] === email){
-                role = "Power user";
+                role = "Power User";
             }
         })
     }).then(() => {

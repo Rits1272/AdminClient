@@ -29,15 +29,13 @@ const queryDate = () => {
     let day = today.getDate();
     let month = today.getMonth() + 1;
     let year = today.getFullYear();
-
+    
     if(month <= 9){
         month = '0' + month;
     }
-
     if(day <= 9){
         day = '0' + day;
     }
-
     return `${day}-${month}-${year}`;
 }
 
@@ -64,10 +62,9 @@ const useStyles = makeStyles({
 function Home(props) {
     const classes = useStyles();
     const { data } = props;
-    const { dispatch, isAuthenticated } = props;
+    const { dispatch, isAuthenticated, role } = props;
     
     useEffect(() => {
-        console.log("IS AUTHENTICATED", isAuthenticated);
         dispatch(getDailyReport(queryDate()))
         const time = 1000 * 60 * 5; // polls in every 5 minutes
         setInterval(() => dispatch(getDailyReport(queryDate())), time);
@@ -76,6 +73,14 @@ function Home(props) {
     if(!isAuthenticated){
         return <Redirect to='/login' />
     }
+
+    const check = () => {
+        if(role !== "Admin" && role !== "Monitor"){
+            return <Redirect to='/notAllowed'/>
+        }    
+    }
+
+    setTimeout(() => check(), 2000);
 
     return (
         <div style={{ display: 'flex' }}>
@@ -133,6 +138,7 @@ function Home(props) {
 const mapState = state => ({
     data : state.reportReducer.data,
     isAuthenticated: state.loginReducer.isAuthenticated,
+    role: state.loginReducer.role,
 })
 
 export default connect(mapState)(Home);

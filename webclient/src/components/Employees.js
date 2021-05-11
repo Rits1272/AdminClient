@@ -4,18 +4,12 @@ import GridList from '@material-ui/core/GridList';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import NavBar from '../utils/NavBar';
-import CancelIcon from '@material-ui/icons/Cancel';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Button from '@material-ui/core/Button';
-
 import  { connect } from 'react-redux';
 import { fetchEmployees } from '../actions/employeeAction';
+import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     gridList: {
@@ -46,37 +40,27 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+
 function Employees(props) {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
+    const { isAuthenticated } = props;
     
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    if(!isAuthenticated){
+        return <Redirect to='/login'/>
+    }
 
     return (
         <div style={{ display: 'flex' }}>
             <NavBar />
-            <div style={{ width: '100' }}>
-                <GridList cols={3}>
+            <div style={{ width: '100%', overflow: 'hidden'}}>
+                <GridList cols={3} style={{ paddingBottom: 50 }}>
                     {props.employees.employeeReducer.map((tile) => (
-                        <Card className={classes.root}>
+                        <Card className={classes.root} elevation={2}>
                             <CardHeader
-                                action={
-                                    <div>
-                                        <IconButton aria-label="settings" onClick={handleClickOpen}>
-                                            <CancelIcon style={{ color: 'red' }} />
-                                        </IconButton>
-                                    </div>
-                                }
                                 title={tile.name}
                                 subheader={tile.role}
                             />
-
                             <CardContent>
                                 <Typography className={classes.title} gutterBottom>
                                     Email: {tile.email}
@@ -85,34 +69,17 @@ function Employees(props) {
                                     Phone: {tile.contact}
                                 </Typography>
                             </CardContent>
-
                         </Card>
                     ))}
-
                 </GridList>
             </div>
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Are you sure you want to delete the user?</DialogTitle>
-                <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                        Disagree
-          </Button>
-                    <Button onClick={handleClose} color="secondary" autoFocus>
-                        Agree
-          </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 }
 
 const mapState = state => ({
-    employees: state
+    employees: state,
+    isAuthenticated: state.loginReducer.isAuthenticated,
 })
 
 const mapDispatch = dispatch => {

@@ -17,7 +17,9 @@ export const fetchInspectors = (inspectors) => {
 export const getInspector = () => dispatch => {
     const inspectors = {};
     const ref = firebase.database().ref();
-    const inspectorRef = ref.child('inspector').once("value", snap => {
+    
+    // Fetching the list of inspector names
+    ref.child('inspector').once("value", snap => {
         const data = snap.val();
         Object.keys(data).map(key => {
             inspectors[data[key]['name']] = data[key]['phn'];
@@ -44,6 +46,7 @@ export const AddNewDrawing = (drawing, inspector, contact, quantity) => dispatch
         quantity: quantity,
         date: today,
         time: time,
-        inspector_name: inspector,    
+        inspector_name: inspector,  
+        quality_inspected: 0,  
     }).then(() => dispatch(addDrawing()));
 }       
