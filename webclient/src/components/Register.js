@@ -197,7 +197,7 @@ function Register(props) {
                                 <MenuItem value={"inspector"}>Inspector</MenuItem>
                                 <MenuItem value={"custodian"}>Initiator</MenuItem>
                                 <MenuItem value={"monitor"}>Monitor</MenuItem>
-                                <MenuItem value={"Power user"}>Power User</MenuItem>
+                                <MenuItem value={"power_user"}>Power User</MenuItem>
                             </Select>
                         </FormControl>
                         <Button
@@ -209,7 +209,7 @@ function Register(props) {
                             onClick={e => registerUser(e)}
                         >
                             Register
-          </Button>
+                        </Button>
                     </form>
                 </div>
                 <Box mt={8}>

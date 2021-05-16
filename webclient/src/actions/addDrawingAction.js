@@ -21,23 +21,25 @@ export const getInspector = () => dispatch => {
     // Fetching the list of inspector names
     ref.child('inspector').once("value", snap => {
         const data = snap.val();
-        Object.keys(data).map(key => {
-            inspectors[data[key]['name']] = data[key]['phn'];
-        });
+        if(data !== null){
+            Object.keys(data).map(key => {
+                inspectors[data[key]['name']] = data[key]['phn'];
+                inspectors['i_token'] = data[key]['i_token']
+            });
+        }
     })
     .then(() => dispatch(fetchInspectors(inspectors)));
 }
 
-export const AddNewDrawing = (drawing, inspector, contact, quantity) => dispatch => {
+export const AddNewDrawing = (drawing, inspector, contact, quantity, i_token) => dispatch => {
     const ref = firebase.database().ref();
-
     var today = new Date();
     var time = today.getHours() + ":" + today.getMinutes();
 
     var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0
     var yyyy = today.getFullYear();
-    today = mm + '-' + dd + '-' + yyyy;
+    today = dd + '-' + mm + '-' + yyyy;
 
     ref.child(`item/${drawing}`).set({
         drawing_no: drawing,
@@ -47,6 +49,7 @@ export const AddNewDrawing = (drawing, inspector, contact, quantity) => dispatch
         date: today,
         time: time,
         inspector_name: inspector,  
-        quality_inspected: 0,  
+        quantity_inspected: 0, 
+        i_token: i_token,
     }).then(() => dispatch(addDrawing()));
 }       

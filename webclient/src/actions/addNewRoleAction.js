@@ -1,9 +1,10 @@
 import { ADD_ROLE } from '../types';
 import firebase from '../Firebase';
 
-export const addRole = () => {
+export const addRole = (code) => {
     return {
         type: ADD_ROLE,
+        success: code,
     };
 }
 
@@ -14,26 +15,26 @@ export const addRole = () => {
 export const AddNewRole = (name, email, password, phone, role) => dispatch => {
     try {
         // Register the user email
-        firebase.auth().createUserWithEmailAndPassword(email, password);
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => {
+            let nodeEmail = email.replace('.', ','); // Firebase do not support `.` character in Node name
 
-        let nodeEmail = email.replace('.', ','); // Firebase do not support `.` character in Node name
+            // Add metadata of the user
+            firebase.database().ref().child(`${role}/${nodeEmail}`).set({
+                name: name,
+                reg_id: email,
+                phn: phone,
+            });
 
-        // Add metadata of the user
-        firebase.database().ref().child(`${role}/${nodeEmail}`).set({
-            name: name,
-            reg_id: email,
-            phn: phone,
-        });
-
-        // Send Password Reset Link. Timeout is fix latency issues
-        setTimeout(() => {
+            // Send reset link
             firebase.auth().sendPasswordResetEmail(email);
-        }, 1000);
 
-        dispatch(addRole());
+        })
+        dispatch(addRole(true));
     }
     catch(err) {
-        console.log("Some unknown error occurred", err);
+        dispatch(addRole(false));
+        console.log("Some unknown error occurred in adding new role", err);
     }
 }
 

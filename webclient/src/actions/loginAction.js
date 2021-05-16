@@ -70,8 +70,6 @@ export const userRole = (email) => dispatch => {
     ref.child('power_user').on("value", snap => {
         const data = snap.val();
         Object.keys(data).map(key => {
-            console.log(data[key]['reg_id']) 
-            console.log(email)
             if(data[key]["reg_id"] === email){
                 role = "power user"
                 dispatch(getRole(role));

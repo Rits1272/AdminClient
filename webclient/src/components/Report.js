@@ -181,8 +181,6 @@ function Report(props) {
           let obj = { 'date': res['date'], 'inspector': res['inspector'], 'drawing': res['drawing'], 'quantity': res['quantity'], 'status': res['status'] };
 
           let q = res['quantity'];
-          q = q.slice(0, q.length-2);
-          q = parseInt(q);
 
           tmp.push(obj);
           dateSet.add(res['date']);

@@ -98,9 +98,7 @@ function AddDrawing(props) {
             setType("error");
             return;
         }
-
-        dispatch(AddNewDrawing(drawing, inspector, inspectors[inspector], quantity)); // saves drawing to database
-
+        dispatch(AddNewDrawing(drawing, inspector, inspectors[inspector], quantity, inspectors['i_token'])); // saves drawing to database
         setTimeout(() => {
             if(success){
                 setDrawing("");
@@ -173,9 +171,11 @@ function AddDrawing(props) {
                                     onChange={e => setValue(e, "inspector")}
                                 >
                                     {Object.keys(inspectors).map(key => {
-                                        return (
-                                            <MenuItem value={key}>{key}</MenuItem>
-                                        )
+                                        if(key !== "i_token"){
+                                            return (
+                                                <MenuItem value={key}>{key}</MenuItem>
+                                            )
+                                        }
                                     })}
                                 </Select>
                         </FormControl>
@@ -186,7 +186,7 @@ function AddDrawing(props) {
                             value={quantity}
                             fullWidth
                             label="Quantity"
-                            type="string"
+                            type="number"
                             onChange={(e) => setValue(e, "quantity")}
                         />
                         <Button

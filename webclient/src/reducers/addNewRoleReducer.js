@@ -9,7 +9,7 @@ const addNewRoleReducer = (state=initialState, action) => {
         case ADD_ROLE:
             return {
                 ...state,
-                success: true,
+                success: action.message,
             };
         default:
             return state;

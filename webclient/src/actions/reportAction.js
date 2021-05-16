@@ -9,25 +9,28 @@ export const dailyReport = data => ({
 export const getDailyReport = (queryDate) => dispatch => {
     let data = [];
     const ref = firebase.database().ref();
-    const itemref = ref.child('item');
+    const today = new Date();
+    const month = String(today.getMonth() + 1); //January is 0
+    const year = today.getFullYear();
+    const itemref = ref.child(`report/${year}/${month}`)
     try{   
-        const wait = itemref.once("value", snap => {
+        itemref.once("value", snap => {
             let Data = snap.val();
-            Object.keys(Data).map(key => {
-                let res = Data[key];
-                if(res['date'] === queryDate){
-                    data.push({ 
-                        date: res['date'], 
-                        inspector: res['inspector_name'], 
-                        drawing: res['drawing_no'], 
-                        quantity: res['quantity'], 
-                        status: res['status']
-                    });
-                }
-            })
-        });
-
-        wait.then(() => dispatch(dailyReport(data)));
+            if(Data !== null){
+                Object.keys(Data).map(key => {
+                    let res = Data[key]
+                    if(res['date'] === queryDate){
+                        data.push({ 
+                            date: res['date'], 
+                            inspector: res['inspector'], 
+                            drawing: res['drawing'], 
+                            quantity: res['quantity'], 
+                            status: res['status']
+                        });
+                    }
+                })
+            }
+        }).then(() => dispatch(dailyReport(data)));
     }
     catch(err){
         console.log("Unable to get daily report");
